@@ -16,6 +16,7 @@ class TaskTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(title),
+      onTap: () => onChanged(!isDone),
       leading: Checkbox(
         value: isDone,
         onChanged: onChanged,

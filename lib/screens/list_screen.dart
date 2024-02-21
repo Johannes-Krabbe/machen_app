@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:machen_app/components/task_tile.dart';
 
 class Task {
-  final String id;
+  final int id;
   final String title;
   final bool isDone;
 
@@ -21,9 +21,10 @@ class ListScreen extends StatefulWidget {
 }
 
 class _ListScreenState extends State<ListScreen> {
-  var tasks = <Task>[Task(id: "1", title: "Task", isDone: false)];
+  List tasks = [];
+  final TextEditingController _controller = TextEditingController();
 
-  toggleDone(String id) {
+  toggleDone(int id) {
     setState(() {
       tasks = tasks.map((task) {
         if (task.id == id) {
@@ -38,14 +39,21 @@ class _ListScreenState extends State<ListScreen> {
     });
   }
 
+  addToDo() {
+    setState(() {
+      tasks.add(
+          Task(id: tasks.length, title: _controller.value.text, isDone: false));
+      _controller.clear();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SizedBox(
-            height: 100,
+          Expanded(
             child: ListView(
               children: [
                 ...tasks
@@ -58,34 +66,35 @@ class _ListScreenState extends State<ListScreen> {
               ],
             ),
           ),
-          SafeArea(
-            top: false,
-            child: Container(
-              color: Colors.grey,
-              height: 61,
-              child: const Row(
-                children: [
-                  SizedBox(width: 15),
-                  Expanded(
-                    child: Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                            hintText: "Create new task",
-                            hintStyle: TextStyle(color: Colors.white),
-                            border: InputBorder.none),
-                      ),
-                    ),
+          Container(
+            color: Theme.of(context).brightness == Brightness.light
+                ? Colors.black12
+                : Colors.white12,
+            height: 70,
+            child: Row(
+              children: [
+                const SizedBox(width: 15),
+                Expanded(
+                  child: TextField(
+                    decoration: const InputDecoration(
+                        hintText: "Create new task", border: InputBorder.none),
+                    controller: _controller,
                   ),
-                  SizedBox(width: 15),
-                  Icon(
-                    Icons.send,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(width: 15),
-                ],
-              ),
+                ),
+                const SizedBox(width: 15),
+                IconButton(
+                  icon: const Icon(Icons.send),
+                  onPressed: () => addToDo(),
+                ),
+                const SizedBox(width: 15),
+              ],
             ),
-          )
+          ),
+          Container(
+              color: Theme.of(context).brightness == Brightness.light
+                  ? Colors.black12
+                  : Colors.white12,
+              height: MediaQuery.of(context).padding.bottom),
         ],
       ),
     );

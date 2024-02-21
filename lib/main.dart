@@ -5,8 +5,15 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  var themeMode = ThemeMode.dark;
 
   @override
   Widget build(BuildContext context) {
@@ -14,12 +21,19 @@ class MyApp extends StatelessWidget {
       title: 'Machen',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        useMaterial3: true,
         colorScheme: const ColorScheme.light(),
+        highlightColor: Colors.transparent,
+        splashColor: Colors.transparent,
       ),
       darkTheme: ThemeData(
-        colorScheme: const ColorScheme.dark(),
+        useMaterial3: true,
+        colorScheme:
+            const ColorScheme.dark().copyWith(primary: Colors.lightBlue),
+        highlightColor: Colors.transparent,
+        splashColor: Colors.transparent,
       ),
-      themeMode: ThemeMode.dark,
+      themeMode: themeMode,
       home: const MyHomePage(),
     );
   }
@@ -41,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     switch (selectedIndex) {
       case 0:
-        page = ListScreen();
+        page = const ListScreen();
       case 1:
         page = const Center(
           child: Text(
@@ -59,78 +73,84 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        return Scaffold(
-          // drawer
-          appBar: AppBar(
-            title: const Text('Machen'),
-          ),
-          body: page,
-          drawer: SizedBox(
-            width: constraints.maxWidth * 0.84,
-            child: Drawer(
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(0),
-                    bottomRight: Radius.circular(0)),
+        return Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: SafeArea(
+            bottom: false,
+            child: Scaffold(
+              // drawer
+              appBar: AppBar(
+                title: const Text('Machen'),
               ),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: SafeArea(
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Center(
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 25,
-                                  backgroundImage: NetworkImage(
-                                      "https://www.shutterstock.com/shutterstock/videos/1086926591/thumb/12.jpg?ip=x480"),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'Johannes',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
+              body: page,
+              drawer: SizedBox(
+                width: constraints.maxWidth * 0.84,
+                child: Drawer(
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(0),
+                        bottomRight: Radius.circular(0)),
+                  ),
+                  child: Container(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: [
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Center(
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 25,
+                                    backgroundImage: NetworkImage(
+                                        "https://www.shutterstock.com/shutterstock/videos/1086926591/thumb/12.jpg?ip=x480"),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(15.0),
+                                    child: Text(
+                                      'Johannes',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          Row(
-                            children: [
-                              Icon(Icons.settings),
-                            ],
-                          )
-                        ],
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.calendar_today),
-                        title: const Text('Today'),
-                        onTap: () {
-                          setState(() {
-                            selectedIndex = 0;
-                          });
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.inbox),
-                        title: const Text('Inbox'),
-                        onTap: () {
-                          setState(() {
-                            selectedIndex = 1;
-                          });
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
+                            Row(
+                              children: [
+                                Icon(Icons.settings),
+                              ],
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        ListTile(
+                          leading: const Icon(Icons.calendar_today),
+                          title: const Text('Today'),
+                          onTap: () {
+                            setState(() {
+                              selectedIndex = 0;
+                            });
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.inbox),
+                          title: const Text('Inbox'),
+                          onTap: () {
+                            setState(() {
+                              selectedIndex = 1;
+                            });
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
