@@ -7,9 +7,9 @@ class Auth {
   String? email;
   String? username;
   String? token;
-  String? error;
+  String error;
 
-  Auth({this.email, this.username, this.token, this.error});
+  Auth({this.email, this.username, this.token, this.error = ''});
 
   Auth copyWith({
     String? email,
@@ -37,7 +37,7 @@ class AuthCubit extends Cubit<Auth> {
             email: value.email,
             username: value.username,
             token: value.token,
-            error: value.error,
+            error: value.error ?? '',
           ),
         );
       },

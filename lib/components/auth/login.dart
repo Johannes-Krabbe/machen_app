@@ -68,7 +68,13 @@ class _LoginState extends State<Login> {
                   Expanded(
                     child: BlocBuilder<AuthCubit, Auth>(
                       builder: (context, state) {
-                        return Text('Error: ${state.error}');
+                        if (state.error.isNotEmpty) {
+                          return Text('Error: ${state.error}');
+                        } else if (state.email != null) {
+                          return Text('Logged In: ${state.email}');
+                        }
+                        return const Text(
+                            'Enter your email and password to login.');
                       },
                     ),
                   ),
