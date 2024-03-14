@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:machen_app/auth/auth_bloc.dart';
-import 'package:machen_app/auth/auth_repository.dart';
+import 'package:machen_app/components/auth/login.dart';
 import 'package:machen_app/components/nav_app_bar.dart';
 import 'package:machen_app/screens/list_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final authRepository = AuthRepository();
   runApp(
     BlocProvider(
-      create: (context) => AuthBloc(authRepository)..add(AppStarted()),
+      lazy: false,
+      create: (_) => AuthBloc(),
       child: const MyApp(),
     ),
   );
@@ -59,6 +59,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return const NavAppBar(body: ListScreen(), title: 'Machen');
+    var authBloc = context.watch<AuthBloc>();
+
+    if (authBloc.state.isSuccess) {
+      return const NavAppBar(body: ListScreen(), title: 'Machen');
+    }
+    return const Login();
   }
 }

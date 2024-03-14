@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:machen_app/auth/auth_bloc.dart';
 import 'package:machen_app/components/auth/login.dart';
 import 'package:machen_app/events/todo_event.dart';
 import 'package:machen_app/screens/list_screen.dart';
@@ -51,13 +52,10 @@ class NavDrawer extends StatelessWidget {
                     children: [
                       IconButton(
                           onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => const Login(),
-                              ),
-                            );
+                            var authBloc = context.read<AuthBloc>();
+                            authBloc.add(LogoutAuthEvent());
                           },
-                          icon: const Icon(Icons.settings))
+                          icon: const Icon(Icons.logout))
                     ],
                   )
                 ],
