@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:machen_app/api/api_provider.dart';
 import 'package:machen_app/auth/auth_state.dart';
+
+// move to secure storage reposotory
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // Events
@@ -26,7 +28,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
   }
 
-  Future<bool> _onLogin(LoginAuthEvent event, Emitter<AuthState> emit) async {
+  _onLogin(LoginAuthEvent event, Emitter<AuthState> emit) async {
     emit(state.copyWith(isLoading: true));
 
     var loginResponse =
@@ -39,7 +41,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         isSuccess: false,
         error: loginResponse.messsage,
       ));
-      return false;
     } else {
       emit(state.copyWith(
         isLoading: false,
@@ -47,12 +48,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         isSuccess: true,
         token: loginResponse.token,
       ));
-
-      return true;
     }
   }
 
-  Future<void> _onLogout(LogoutAuthEvent event, Emitter<AuthState> emit) async {
+  _onLogout(LogoutAuthEvent event, Emitter<AuthState> emit) async {
     const storage = FlutterSecureStorage();
     await storage.delete(key: 'token');
     emit(const AuthState());

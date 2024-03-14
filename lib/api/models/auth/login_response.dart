@@ -4,10 +4,12 @@ import 'package:machen_app/api/models/auth/me_model.dart';
 
 class LoginResponse {
   bool? success;
-  String? messsage;
-  String? code;
   String? token;
   MeUser? user;
+
+  // error?
+  String? messsage;
+  String? code;
 
   LoginResponse(
       {this.success, this.messsage, this.code, this.token, this.user});

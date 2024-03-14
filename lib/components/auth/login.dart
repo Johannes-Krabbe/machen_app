@@ -55,10 +55,12 @@ class _LoginState extends State<Login> {
             ElevatedButton(
               onPressed: () {
                 var authBloc = context.read<AuthBloc>();
-                authBloc.add(LoginAuthEvent(
-                    _emailController.text, _passwordController.text));
+                authBloc.add(
+                  LoginAuthEvent(
+                      _emailController.text, _passwordController.text),
+                );
               },
-              child: const Text('Submit'),
+              child: const Text('Login'),
             ),
             Builder(builder: (context) {
               var authBloc = context.watch<AuthBloc>();
