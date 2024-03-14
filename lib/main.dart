@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:machen_app/auth/auth_bloc.dart';
+import 'package:machen_app/auth/auth_repository.dart';
 import 'package:machen_app/components/nav_app_bar.dart';
 import 'package:machen_app/screens/list_screen.dart';
 
-Future main() async {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final authRepository = AuthRepository();
+  runApp(
+    BlocProvider(
+      create: (context) => AuthBloc(authRepository)..add(AppStarted()),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
