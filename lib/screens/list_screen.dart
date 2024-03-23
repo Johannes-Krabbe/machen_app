@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:machen_app/components/task_tile.dart';
-import 'package:machen_app/events/todo_event.dart';
+import 'package:machen_app/state/blocs/todo_list_bloc.dart';
 
 class ListScreen extends StatefulWidget {
   const ListScreen({Key? key}) : super(key: key);
@@ -17,25 +17,24 @@ class _ListScreenState extends State<ListScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => TodoCubit(),
+      create: (_) => TodoListBloc(),
       child: Builder(builder: (context) {
         return Scaffold(
           body: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: BlocBuilder<TodoCubit, List<Todo>>(
-                    builder: (context, state) {
+                child: Builder(builder: (context) {
+                  var todoListBloc = context.watch<TodoListBloc>();
                   return ListView(
                     children: [
-                      ...state
+                      ...todoListBloc.state.items
                           .map(
                             (e) => TaskTile(
-                              title: e.title,
-                              isDone: e.isDone,
-                              onChanged: (value) =>
-                                  context.read<TodoCubit>().toggle(e.id),
-                            ),
+                                title: e.title,
+                                isDone: e.isDone,
+                                onChanged: (value) =>
+                                    {todoListBloc.add(ToggleTodoEvent(e.id))}),
                           )
                           .toList()
                     ],
@@ -62,7 +61,9 @@ class _ListScreenState extends State<ListScreen> {
                     IconButton(
                         icon: const Icon(Icons.send),
                         onPressed: () {
-                          context.read<TodoCubit>().add(_controller.value.text);
+                          context
+                              .read<TodoListBloc>()
+                              .add(AddTodoEvent(_controller.text));
                           _controller.clear();
                         }),
                     const SizedBox(width: 15),

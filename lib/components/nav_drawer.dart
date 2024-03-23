@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:machen_app/auth/auth_bloc.dart';
-import 'package:machen_app/events/todo_event.dart';
 import 'package:machen_app/screens/list_screen.dart';
+import 'package:machen_app/state/blocs/auth_bloc.dart';
 
 class NavDrawer extends StatelessWidget {
   const NavDrawer({
@@ -66,10 +65,7 @@ class NavDrawer extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => BlocProvider(
-                        create: (_) => TodoCubit(),
-                        child: const ListScreen(),
-                      ),
+                      builder: (context) => const ListScreen(),
                     ),
                   );
                 },

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:machen_app/auth/auth_bloc.dart';
-import 'package:machen_app/components/auth/login.dart';
 import 'package:machen_app/components/nav_app_bar.dart';
 import 'package:machen_app/screens/list_screen.dart';
+import 'package:machen_app/state/blocs/auth_bloc.dart';
+import 'package:machen_app/screens/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

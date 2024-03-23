@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:machen_app/api/api_provider.dart';
-import 'package:machen_app/auth/auth_state.dart';
+import 'package:machen_app/api/repositories/auth_repository.dart';
+import 'package:machen_app/state/types/auth_state.dart';
 
 // move to secure storage reposotory
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -18,6 +18,8 @@ final class LoginAuthEvent extends AuthEvent {
 
 final class LogoutAuthEvent extends AuthEvent {}
 
+// Bloc
+
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc() : super(const AuthState()) {
     on<LoginAuthEvent>((event, emit) async {
@@ -32,7 +34,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(state.copyWith(isLoading: true));
 
     var loginResponse =
-        await ApiProvider().login(event.emailOrUsername, event.password);
+        await AuthRepository().login(event.emailOrUsername, event.password);
 
     if (loginResponse.success == false) {
       emit(state.copyWith(
