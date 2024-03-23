@@ -30,11 +30,22 @@ class _ListScreenState extends State<ListScreen> {
                     children: [
                       ...todoListBloc.state.items
                           .map(
-                            (e) => TaskTile(
-                                title: e.title,
-                                isDone: e.isDone,
-                                onChanged: (value) =>
-                                    {todoListBloc.add(ToggleTodoEvent(e.id))}),
+                            (e) => Dismissible(
+                              key: Key(e.id),
+                              onDismissed: (direction) {
+                                todoListBloc.add(DeleteTodoEvent(e.id));
+                              },
+                              background: Container(
+                                color: Colors.red,
+                                child: const Icon(Icons.delete),
+                              ),
+                              child: TaskTile(
+                                  title: e.title,
+                                  isDone: e.isDone,
+                                  onChanged: (value) => {
+                                        todoListBloc.add(ToggleTodoEvent(e.id))
+                                      }),
+                            ),
                           )
                           .toList()
                     ],
