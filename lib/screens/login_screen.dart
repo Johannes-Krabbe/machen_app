@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:machen_app/state/blocs/auth_bloc.dart';
+import 'package:machen_app/state/types/auth_state.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -65,14 +66,12 @@ class _LoginState extends State<Login> {
             Builder(builder: (context) {
               var authBloc = context.watch<AuthBloc>();
 
-              if (authBloc.state.isLoading) {
+              if (authBloc.state.state == AuthStateEnum.loading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (authBloc.state.isFailure) {
+              } else if (authBloc.state.state == AuthStateEnum.failure) {
                 return Center(
                   child: Text(authBloc.state.error ?? 'Unknown error'),
                 );
-              } else if (authBloc.state.isSuccess) {
-                return Center(child: Text(authBloc.state.token));
               } else {
                 return const SizedBox.shrink();
               }

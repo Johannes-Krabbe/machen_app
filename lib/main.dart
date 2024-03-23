@@ -4,6 +4,7 @@ import 'package:machen_app/components/nav_app_bar.dart';
 import 'package:machen_app/screens/list_screen.dart';
 import 'package:machen_app/state/blocs/auth_bloc.dart';
 import 'package:machen_app/screens/login_screen.dart';
+import 'package:machen_app/state/types/auth_state.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -61,9 +62,17 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     var authBloc = context.watch<AuthBloc>();
 
-    if (authBloc.state.isSuccess) {
+    if (authBloc.state.state == AuthStateEnum.initializing) {
+      authBloc.add(AppStartedAuthEvent());
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    } else if (authBloc.state.state == AuthStateEnum.success) {
       return const NavAppBar(body: ListScreen(), title: 'Machen');
+    } else {
+      return const Login();
     }
-    return const Login();
   }
 }
