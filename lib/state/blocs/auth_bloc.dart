@@ -3,7 +3,6 @@ import 'package:machen_app/api/repositories/auth_repository.dart';
 import 'package:machen_app/state/types/auth_state.dart';
 
 // move to secure storage reposotory
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:machen_app/utils/secure_storage_repository.dart';
 
 // Events
@@ -17,6 +16,14 @@ final class LoginAuthEvent extends AuthEvent {
   LoginAuthEvent(this.emailOrUsername, this.password);
 }
 
+final class SignupAuthEvent extends AuthEvent {
+  final String username;
+  final String email;
+  final String password;
+
+  SignupAuthEvent(this.username, this.email, this.password);
+}
+
 final class LogoutAuthEvent extends AuthEvent {}
 
 final class AppStartedAuthEvent extends AuthEvent {}
@@ -27,6 +34,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc() : super(const AuthState()) {
     on<LoginAuthEvent>((event, emit) async {
       await _onLogin(event, emit);
+    });
+    on<SignupAuthEvent>((event, emit) async {
+      await _onSignUp(event, emit);
     });
     on<LogoutAuthEvent>((event, emit) async {
       await _onLogout(event, emit);
@@ -53,6 +63,27 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(state.copyWith(
         state: AuthStateEnum.failure,
         error: loginResponse.messsage,
+      ));
+    }
+  }
+
+  _onSignUp(SignupAuthEvent event, Emitter<AuthState> emit) async {
+    emit(state.copyWith(state: AuthStateEnum.loading));
+
+    var signUpResponse = await AuthRepository()
+        .signup(event.username, event.email, event.password);
+
+    if (signUpResponse.success == true &&
+        signUpResponse.token?.isNotEmpty == true) {
+      await SecureStorageRepository().write('token', signUpResponse.token!);
+      emit(state.copyWith(
+        state: AuthStateEnum.success,
+        token: signUpResponse.token,
+      ));
+    } else {
+      emit(state.copyWith(
+        state: AuthStateEnum.failure,
+        error: signUpResponse.messsage,
       ));
     }
   }

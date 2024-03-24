@@ -1,27 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:machen_app/screens/signup_screen.dart';
 import 'package:machen_app/state/blocs/auth_bloc.dart';
 import 'package:machen_app/state/types/auth_state.dart';
 
-class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
+class Signup extends StatefulWidget {
+  const Signup({Key? key}) : super(key: key);
 
   @override
-  State<Login> createState() => _LoginState();
+  State<Signup> createState() => _SignupState();
 }
 
-class _LoginState extends State<Login> {
+class _SignupState extends State<Signup> {
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _repeatPasswordController =
+      TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    var authBloc = context.watch<AuthBloc>();
+    if (authBloc.state.state == AuthStateEnum.success) {
+      Navigator.of(context).pop();
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text('Signup'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -30,9 +37,23 @@ class _LoginState extends State<Login> {
           child: Column(
             children: [
               TextFormField(
+                controller: _usernameController,
+                decoration: const InputDecoration(
+                  hintText: "Choose a Username",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a username';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
                 controller: _emailController,
                 decoration: const InputDecoration(
-                  hintText: "Enter you Email",
+                  hintText: "Enter your Email",
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
@@ -57,44 +78,47 @@ class _LoginState extends State<Login> {
                   return null;
                 },
               ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _repeatPasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  hintText: "Repeat your Password",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please repeat your password';
+                  }
+                  if (value != _passwordController.text) {
+                    return 'Passwords do not match';
+                  }
+                  return null;
+                },
+              ),
               const SizedBox(height: 24),
               Builder(builder: (context) {
-                var authBloc = context.watch<AuthBloc>();
-
                 if (authBloc.state.state == AuthStateEnum.loading) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (authBloc.state.state == AuthStateEnum.failure) {
                   return Center(
                     child: Text(authBloc.state.error ?? 'Unknown error'),
                   );
+                } else {
+                  return const SizedBox.shrink();
                 }
-                return const SizedBox.shrink();
               }),
               const Spacer(),
-              // link to signup
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const Signup(),
-                    ),
-                  );
-                },
-                child: const Text('Don\'t have an account? Sign up'),
-              ),
               TextButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    var authBloc = context.read<AuthBloc>();
                     authBloc.add(
-                      LoginAuthEvent(
-                        _emailController.text,
-                        _passwordController.text,
-                      ),
+                      SignupAuthEvent(_usernameController.text,
+                          _emailController.text, _passwordController.text),
                     );
                   }
                 },
-                child: const Text('Login', style: TextStyle(fontSize: 30)),
+                child: const Text('Signup', style: TextStyle(fontSize: 30)),
               ),
               const SizedBox(height: 20),
             ],

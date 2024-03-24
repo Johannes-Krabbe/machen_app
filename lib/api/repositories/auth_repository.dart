@@ -23,10 +23,12 @@ class AuthRepository extends ApiProvider {
     return LoginResponse(success: false, messsage: 'Unknown error');
   }
 
-  Future<SignupResponse> signup(String emailOrUsername, String password) async {
+  Future<SignupResponse> signup(
+      String username, String email, String password) async {
     try {
-      Response response = await dio.post("/auth/login", data: {
-        "emailOrUsername": emailOrUsername,
+      Response response = await dio.post("/auth/signup", data: {
+        "username": username,
+        "email": email,
         "password": password,
       });
 
@@ -34,9 +36,10 @@ class AuthRepository extends ApiProvider {
     } catch (error) {
       if (error is DioException) {
         return SignupResponse(
-            success: false,
-            messsage: error.response?.data["message"] ?? 'Unknown error',
-            code: error.response?.data["code"]);
+          success: false,
+          messsage: error.response?.data["message"] ?? 'Unknown error',
+          code: error.response?.data["code"],
+        );
       }
     }
     return SignupResponse(
