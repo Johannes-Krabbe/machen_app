@@ -21,11 +21,6 @@ class _SignupState extends State<Signup> {
 
   @override
   Widget build(BuildContext context) {
-    var authBloc = context.watch<AuthBloc>();
-    if (authBloc.state.state == AuthStateEnum.success) {
-      Navigator.of(context).pop();
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Signup'),
@@ -98,6 +93,7 @@ class _SignupState extends State<Signup> {
               ),
               const SizedBox(height: 24),
               Builder(builder: (context) {
+                var authBloc = context.watch<AuthBloc>();
                 if (authBloc.state.state == AuthStateEnum.loading) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (authBloc.state.state == AuthStateEnum.failure) {
@@ -112,6 +108,7 @@ class _SignupState extends State<Signup> {
               TextButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
+                    var authBloc = context.read<AuthBloc>();
                     authBloc.add(
                       SignupAuthEvent(_usernameController.text,
                           _emailController.text, _passwordController.text),

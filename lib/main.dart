@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:machen_app/components/nav_app_bar.dart';
 import 'package:machen_app/screens/list_screen.dart';
+import 'package:machen_app/screens/signup_screen.dart';
 import 'package:machen_app/state/blocs/auth_bloc.dart';
 import 'package:machen_app/screens/login_screen.dart';
 import 'package:machen_app/state/types/auth_state.dart';
@@ -29,6 +29,12 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    var authBloc = context.watch<AuthBloc>();
+
+    if (authBloc.state.state == AuthStateEnum.initializing) {
+      authBloc.add(AppStartedAuthEvent());
+    }
+
     return MaterialApp(
       title: 'Machen',
       debugShowCheckedModeBanner: false,
@@ -45,34 +51,11 @@ class _MyAppState extends State<MyApp> {
         splashColor: Colors.transparent,
       ),
       themeMode: themeMode,
-      home: const MyHomePage(),
+      home: authBloc.state.state == AuthStateEnum.success
+          ? const ListScreen()
+          : authBloc.state.pageState == AuthPageStateEnum.login
+              ? const Login()
+              : const Signup(),
     );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    var authBloc = context.watch<AuthBloc>();
-
-    if (authBloc.state.state == AuthStateEnum.initializing) {
-      authBloc.add(AppStartedAuthEvent());
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    } else if (authBloc.state.state == AuthStateEnum.success) {
-      return const NavAppBar(body: ListScreen(), title: 'Machen');
-    } else {
-      return const Login();
-    }
   }
 }

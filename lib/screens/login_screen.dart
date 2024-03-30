@@ -74,11 +74,8 @@ class _LoginState extends State<Login> {
               // link to signup
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const Signup(),
-                    ),
-                  );
+                  var authBloc = context.read<AuthBloc>();
+                  authBloc.add(ChangePageAuthEvent(AuthPageStateEnum.signup));
                 },
                 child: const Text('Don\'t have an account? Sign up'),
               ),

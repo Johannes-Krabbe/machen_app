@@ -28,6 +28,12 @@ final class LogoutAuthEvent extends AuthEvent {}
 
 final class AppStartedAuthEvent extends AuthEvent {}
 
+final class ChangePageAuthEvent extends AuthEvent {
+  final AuthPageStateEnum pageState;
+
+  ChangePageAuthEvent(this.pageState);
+}
+
 // Bloc
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -43,6 +49,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
     on<AppStartedAuthEvent>((event, emit) async {
       await _onAppStarted(event, emit);
+    });
+    on<ChangePageAuthEvent>((event, emit) async {
+      emit(state.copyWith(pageState: event.pageState));
     });
   }
 
