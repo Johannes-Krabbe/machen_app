@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:machen_app/screens/signup_screen.dart';
 import 'package:machen_app/state/blocs/auth_bloc.dart';
 import 'package:machen_app/state/types/auth_state.dart';
 

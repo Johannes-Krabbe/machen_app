@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:machen_app/my_app.dart';
 import 'package:machen_app/screens/list_screen.dart';
 import 'package:machen_app/screens/signup_screen.dart';
 import 'package:machen_app/state/blocs/auth_bloc.dart';
@@ -12,19 +13,19 @@ void main() async {
     BlocProvider(
       lazy: false,
       create: (_) => AuthBloc(),
-      child: const MyApp(),
+      child: const AppRoot(),
     ),
   );
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class AppRoot extends StatefulWidget {
+  const AppRoot({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<AppRoot> createState() => _AppRootState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _AppRootState extends State<AppRoot> {
   var themeMode = ThemeMode.dark;
 
   @override
@@ -52,7 +53,7 @@ class _MyAppState extends State<MyApp> {
       ),
       themeMode: themeMode,
       home: authBloc.state.state == AuthStateEnum.success
-          ? const ListScreen()
+          ? const MyApp()
           : authBloc.state.pageState == AuthPageStateEnum.login
               ? const Login()
               : const Signup(),
