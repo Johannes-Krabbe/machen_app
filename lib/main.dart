@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:machen_app/my_app.dart';
-import 'package:machen_app/screens/list_screen.dart';
 import 'package:machen_app/screens/signup_screen.dart';
 import 'package:machen_app/state/blocs/auth_bloc.dart';
 import 'package:machen_app/screens/login_screen.dart';
@@ -36,6 +35,25 @@ class _AppRootState extends State<AppRoot> {
       authBloc.add(AppStartedAuthEvent());
     }
 
+    Widget currentRenderedPage;
+
+    if (authBloc.state.state == AuthStateEnum.success) {
+      currentRenderedPage = const MyApp();
+    } else if (authBloc.state.state == AuthStateEnum.initializing) {
+      currentRenderedPage = const Center(
+        child: CircularProgressIndicator(),
+      );
+    } else if (authBloc.state.pageState == AuthPageStateEnum.login) {
+      currentRenderedPage = const Login();
+    } else if (authBloc.state.pageState == AuthPageStateEnum.signup) {
+      currentRenderedPage = const Signup();
+    } else {
+      //center loading spinner
+      currentRenderedPage = const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     return MaterialApp(
       title: 'Machen',
       debugShowCheckedModeBanner: false,
@@ -52,11 +70,7 @@ class _AppRootState extends State<AppRoot> {
         splashColor: Colors.transparent,
       ),
       themeMode: themeMode,
-      home: authBloc.state.state == AuthStateEnum.success
-          ? const MyApp()
-          : authBloc.state.pageState == AuthPageStateEnum.login
-              ? const Login()
-              : const Signup(),
+      home: currentRenderedPage,
     );
   }
 }

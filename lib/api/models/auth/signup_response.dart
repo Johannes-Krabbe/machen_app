@@ -7,16 +7,16 @@ class SignupResponse {
   String? messsage;
   String? code;
   String? token;
-  MeUser? user;
+  MeUserModel? user;
 
   SignupResponse(
       {this.success, this.messsage, this.code, this.token, this.user});
 
   SignupResponse.fromJson(Map<String, dynamic> json) {
-    success = json['success'] ?? !json['error'];
+    success = json['success'];
     messsage = json['message'];
     code = json['code'];
     token = json['token'];
-    user = json['user'] != null ? MeUser.fromJson(json['user']) : null;
+    user = json['user'] != null ? MeUserModel.fromJson(json['user']) : null;
   }
 }

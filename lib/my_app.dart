@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:machen_app/screens/list_screen.dart';
 import 'package:machen_app/screens/settings_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:machen_app/state/blocs/auth_bloc.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -26,6 +28,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    var authBloc = context.watch<AuthBloc>();
+
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: SafeArea(
@@ -50,19 +54,19 @@ class _MyAppState extends State<MyApp> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Center(
+                        Center(
                           child: Row(
                             children: [
-                              CircleAvatar(
+                              const CircleAvatar(
                                 radius: 25,
                                 backgroundImage: NetworkImage(
                                     "https://www.shutterstock.com/shutterstock/videos/1086926591/thumb/12.jpg?ip=x480"),
                               ),
                               Padding(
-                                padding: EdgeInsets.all(15.0),
+                                padding: const EdgeInsets.all(15.0),
                                 child: Text(
-                                  'Johannes',
-                                  style: TextStyle(
+                                  authBloc.state.me?.name ?? "",
+                                  style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
                                   ),

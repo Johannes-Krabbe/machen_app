@@ -1,5 +1,6 @@
 import 'package:machen_app/api/api_provider.dart';
 import 'package:machen_app/api/models/auth/login_response.dart';
+import 'package:machen_app/api/models/auth/me_response.dart';
 import 'package:machen_app/api/models/auth/signup_response.dart';
 import 'package:dio/dio.dart';
 
@@ -43,6 +44,27 @@ class AuthRepository extends ApiProvider {
       }
     }
     return SignupResponse(
+      success: false,
+      messsage: 'Unknown error',
+    );
+  }
+
+  Future<MeResponse> me(String token) async {
+    try {
+      Response response = await dio.get("/auth/me",
+          options: Options(headers: {"authorization": "Bearer $token"}));
+
+      return MeResponse.fromJson(response.data);
+    } catch (error) {
+      if (error is DioException) {
+        return MeResponse(
+          success: false,
+          messsage: error.response?.data["message"] ?? 'Unknown error',
+          code: error.response?.data["code"],
+        );
+      }
+    }
+    return MeResponse(
       success: false,
       messsage: 'Unknown error',
     );

@@ -2,23 +2,18 @@
 
 import 'package:machen_app/api/models/auth/me_model.dart';
 
-class LoginResponse {
+class MeResponse {
   bool? success;
-  String? token;
-  MeUserModel? user;
-
-  // error?
   String? messsage;
   String? code;
+  MeUserModel? user;
 
-  LoginResponse(
-      {this.success, this.messsage, this.code, this.token, this.user});
+  MeResponse({this.success, this.messsage, this.code, this.user});
 
-  LoginResponse.fromJson(Map<String, dynamic> json) {
+  MeResponse.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     messsage = json['message'];
     code = json['code'];
-    token = json['token'];
     user = json['user'] != null ? MeUserModel.fromJson(json['user']) : null;
   }
 }

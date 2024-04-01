@@ -1,13 +1,13 @@
-class MeUser {
+class MeUserModel {
   String? id;
   String? username;
   String? name;
   String? role;
   String? email;
 
-  MeUser({this.id, this.username, this.name, this.role, this.email});
+  MeUserModel({this.id, this.username, this.name, this.role, this.email});
 
-  MeUser.fromJson(Map<String, dynamic> json) {
+  MeUserModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     username = json['username'];
     name = json['name'];

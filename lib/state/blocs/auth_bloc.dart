@@ -28,6 +28,8 @@ final class LogoutAuthEvent extends AuthEvent {}
 
 final class AppStartedAuthEvent extends AuthEvent {}
 
+final class FetchMeAuthEvent extends AuthEvent {}
+
 final class ChangePageAuthEvent extends AuthEvent {
   final AuthPageStateEnum pageState;
 
@@ -50,6 +52,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AppStartedAuthEvent>((event, emit) async {
       await _onAppStarted(event, emit);
     });
+    on<FetchMeAuthEvent>((event, emit) async {
+      await _onFetchMe(event, emit);
+    });
     on<ChangePageAuthEvent>((event, emit) async {
       emit(state.copyWith(pageState: event.pageState));
     });
@@ -63,11 +68,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     if (loginResponse.success == true &&
         loginResponse.token?.isNotEmpty == true) {
-      await SecureStorageRepository().write('token', loginResponse.token!);
-      emit(state.copyWith(
-        state: AuthStateEnum.success,
-        token: loginResponse.token,
-      ));
+      var meResponse = await AuthRepository().me(loginResponse.token!);
+
+      if (meResponse.success == true) {
+        await SecureStorageRepository().write('token', loginResponse.token!);
+        emit(state.copyWith(
+          state: AuthStateEnum.success,
+          token: loginResponse.token,
+          me: meResponse.user,
+        ));
+      } else {
+        emit(state.copyWith(
+          state: AuthStateEnum.failure,
+          error: "Something went wrong, please try again.",
+        ));
+      }
     } else {
       emit(state.copyWith(
         state: AuthStateEnum.failure,
@@ -84,16 +99,36 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     if (signUpResponse.success == true &&
         signUpResponse.token?.isNotEmpty == true) {
-      await SecureStorageRepository().write('token', signUpResponse.token!);
-      emit(state.copyWith(
-        state: AuthStateEnum.success,
-        token: signUpResponse.token,
-      ));
+      var meResponse = await AuthRepository().me(signUpResponse.token!);
+
+      if (meResponse.success == true) {
+        await SecureStorageRepository().write('token', signUpResponse.token!);
+        emit(state.copyWith(
+          state: AuthStateEnum.success,
+          token: signUpResponse.token,
+          me: meResponse.user,
+        ));
+      } else {
+        emit(state.copyWith(
+          state: AuthStateEnum.failure,
+          error: "Something went wrong, please try again.",
+        ));
+      }
     } else {
       emit(state.copyWith(
         state: AuthStateEnum.failure,
         error: signUpResponse.messsage,
       ));
+    }
+  }
+
+  _onFetchMe(FetchMeAuthEvent event, Emitter<AuthState> emit) async {
+    var token = await SecureStorageRepository().read('token');
+    if (token != null) {
+      var meResponse = await AuthRepository().me(token);
+      if (meResponse.success == true) {
+        emit(state.copyWith(me: meResponse.user));
+      }
     }
   }
 
@@ -107,7 +142,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if (token == null) {
       emit(const AuthState(state: AuthStateEnum.none));
     } else {
-      emit(state.copyWith(state: AuthStateEnum.success, token: token));
+      var meResponse = await AuthRepository().me(token);
+
+      if (meResponse.success == true) {
+        emit(state.copyWith(
+            state: AuthStateEnum.success, token: token, me: meResponse.user));
+      } else {
+        emit(const AuthState(state: AuthStateEnum.none));
+      }
     }
   }
 }
