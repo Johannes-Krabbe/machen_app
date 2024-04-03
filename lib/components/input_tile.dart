@@ -14,6 +14,8 @@ class InputTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController controller = TextEditingController();
+
     return ListTile(
       onTap: () => showDialog<String>(
         context: context,
@@ -41,6 +43,7 @@ class InputTile extends StatelessWidget {
                       hintText: "Enter your new $title",
                       border: InputBorder.none,
                     ),
+                    controller: controller,
                     autofocus: true,
                   ),
                 ),
@@ -54,9 +57,33 @@ class InputTile extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     TextButton(
-                      onPressed: () {
-                        updateFunc();
-                        Navigator.pop(context, 'Update');
+                      onPressed: () async {
+                        if (controller.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Center(
+                                  child: Text(
+                                "Please enter a valid $title",
+                                style: const TextStyle(fontSize: 18),
+                              )),
+                            ),
+                          );
+                          return;
+                        }
+                        var response = await updateFunc(controller.text);
+                        if (response.success == true) {
+                          Navigator.pop(context, 'Update');
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Center(
+                                  child: Text(
+                                response.messsage ?? 'Unknown error',
+                                style: const TextStyle(fontSize: 18),
+                              )),
+                            ),
+                          );
+                        }
                       },
                       child: const Text('Update'),
                     ),

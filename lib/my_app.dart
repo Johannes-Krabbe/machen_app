@@ -64,11 +64,17 @@ class _MyAppState extends State<MyApp> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(15.0),
-                                child: Text(
-                                  authBloc.state.me?.name ?? "",
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                                child: SizedBox(
+                                  width: 130,
+                                  height: 25,
+                                  child: Text(
+                                    authBloc.state.me?.name ?? "",
+                                    softWrap: false,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      overflow: TextOverflow.fade,
+                                    ),
                                   ),
                                 ),
                               ),
