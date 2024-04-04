@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:machen_app/screens/list_screen.dart';
 import 'package:machen_app/screens/settings_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:machen_app/screens/todo_list_screen.dart';
 import 'package:machen_app/state/blocs/auth_bloc.dart';
+import 'package:machen_app/state/blocs/todo_list_bloc.dart';
+import 'package:machen_app/state/blocs/todo_lists_bloc.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -14,12 +16,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   int _selectedIndex = 0;
 
-  final List<AppRoute> _widgetOptions = <AppRoute>[
-    AppRoute(widget: const ListScreen(), title: "List"),
-    AppRoute(widget: const Text('Index 1: Business'), title: "Business"),
-    AppRoute(widget: const Text('Index 2: School'), title: "School"),
-  ];
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -27,8 +23,33 @@ class _MyAppState extends State<MyApp> {
   }
 
   @override
+  void initState() {
+    var todoListBloc = context.read<TodoListsBloc>();
+    var authBloc = context.read<AuthBloc>();
+    todoListBloc.add(TodoListsLoadEvent(authBloc.state.token));
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     var authBloc = context.watch<AuthBloc>();
+    var todoListBloc = context.watch<TodoListsBloc>();
+
+    final List<AppRoute> todoListRoutes = todoListBloc.state.lists
+        .map(
+          (e) => AppRoute(
+              widget: BlocProvider(
+                  create: (_) => TodoListBloc(),
+                  child: TodoListScreen(todoListId: e.id ?? '')),
+              title: e.name ?? ''),
+        )
+        .toList();
+
+    final AppRoute selectedRoute = todoListRoutes.isEmpty
+        ? AppRoute(
+            widget: const Center(child: CircularProgressIndicator()), title: "")
+        : todoListRoutes[_selectedIndex];
 
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
@@ -36,9 +57,9 @@ class _MyAppState extends State<MyApp> {
         bottom: false,
         child: Scaffold(
             appBar: AppBar(
-              title: Text(_widgetOptions[_selectedIndex].title),
+              title: Text(selectedRoute.title),
             ),
-            body: _widgetOptions[_selectedIndex].widget,
+            body: selectedRoute.widget,
             drawer: Drawer(
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
@@ -73,7 +94,7 @@ class _MyAppState extends State<MyApp> {
                                     style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
-                                      overflow: TextOverflow.fade,
+                                      overflow: TextOverflow.clip,
                                     ),
                                   ),
                                 ),
@@ -96,7 +117,7 @@ class _MyAppState extends State<MyApp> {
                         )
                       ],
                     ),
-                    ..._widgetOptions
+                    ...todoListRoutes
                         .asMap()
                         .entries
                         .map((e) => ListTile(

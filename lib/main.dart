@@ -4,17 +4,25 @@ import 'package:machen_app/my_app.dart';
 import 'package:machen_app/screens/signup_screen.dart';
 import 'package:machen_app/state/blocs/auth_bloc.dart';
 import 'package:machen_app/screens/login_screen.dart';
+import 'package:machen_app/state/blocs/todo_lists_bloc.dart';
 import 'package:machen_app/state/types/auth_state.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    BlocProvider(
-      lazy: false,
-      create: (_) => AuthBloc(),
-      child: const AppRoot(),
-    ),
-  );
+  runApp(MultiProvider(
+    providers: [
+      BlocProvider(
+        lazy: false,
+        create: (_) => AuthBloc(),
+      ),
+      BlocProvider(
+        lazy: false,
+        create: (_) => TodoListsBloc(),
+      ),
+    ],
+    child: const AppRoot(),
+  ));
 }
 
 class AppRoot extends StatefulWidget {

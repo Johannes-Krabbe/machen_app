@@ -3,22 +3,30 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:machen_app/components/task_tile.dart';
 import 'package:machen_app/state/blocs/todo_list_bloc.dart';
 
-class ListScreen extends StatefulWidget {
-  const ListScreen({Key? key}) : super(key: key);
+class TodoListScreen extends StatefulWidget {
+  final String todoListId;
+
+  const TodoListScreen({Key? key, required this.todoListId}) : super(key: key);
 
   @override
-  State<ListScreen> createState() => _ListScreenState();
+  State<TodoListScreen> createState() => _TodoListScreenState();
 }
 
-class _ListScreenState extends State<ListScreen> {
+class _TodoListScreenState extends State<TodoListScreen> {
   List tasks = [];
   final TextEditingController _controller = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    context.read<TodoListBloc>().add(TodoListFetchEvent(widget.todoListId));
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => TodoListBloc(),
-      child: Builder(builder: (context) {
+    widget.todoListId;
+    return Builder(
+      builder: (context) {
         return Scaffold(
           body: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -33,7 +41,7 @@ class _ListScreenState extends State<ListScreen> {
                             (e) => Dismissible(
                               key: Key(e.id),
                               onDismissed: (direction) {
-                                todoListBloc.add(DeleteTodoEvent(e.id));
+                                todoListBloc.add(TodoListDeleteEvent(e.id));
                               },
                               background: Container(
                                 color: Colors.red,
@@ -43,7 +51,8 @@ class _ListScreenState extends State<ListScreen> {
                                   title: e.title,
                                   isDone: e.isDone,
                                   onChanged: (value) => {
-                                        todoListBloc.add(ToggleTodoEvent(e.id))
+                                        todoListBloc
+                                            .add(TodoListToggleEvent(e.id))
                                       }),
                             ),
                           )
@@ -74,7 +83,7 @@ class _ListScreenState extends State<ListScreen> {
                         onPressed: () {
                           context
                               .read<TodoListBloc>()
-                              .add(AddTodoEvent(_controller.text));
+                              .add(TodoListAddEvent(_controller.text));
                           _controller.clear();
                         }),
                     const SizedBox(width: 15),
@@ -89,7 +98,7 @@ class _ListScreenState extends State<ListScreen> {
             ],
           ),
         );
-      }),
+      },
     );
   }
 }

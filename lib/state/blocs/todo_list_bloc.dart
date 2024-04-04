@@ -5,48 +5,56 @@ import 'package:machen_app/state/types/todo_list_state.dart';
 
 sealed class TodoListEvent {}
 
-final class FetchTodoListEvent extends TodoListEvent {
-  final String listId;
+final class TodoListFetchEvent extends TodoListEvent {
+  final String todoListId;
 
-  FetchTodoListEvent(this.listId);
+  TodoListFetchEvent(this.todoListId);
 }
 
-final class AddTodoEvent extends TodoListEvent {
+final class TodoListAddEvent extends TodoListEvent {
   final String title;
 
-  AddTodoEvent(this.title);
+  TodoListAddEvent(this.title);
 }
 
-final class DeleteTodoEvent extends TodoListEvent {
+final class TodoListDeleteEvent extends TodoListEvent {
   final String id;
 
-  DeleteTodoEvent(this.id);
+  TodoListDeleteEvent(this.id);
 }
 
-final class ToggleTodoEvent extends TodoListEvent {
+final class TodoListToggleEvent extends TodoListEvent {
   final String id;
 
-  ToggleTodoEvent(this.id);
+  TodoListToggleEvent(this.id);
 }
 
 // Bloc
 
 class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
   TodoListBloc() : super(TodoListState(id: '', items: [])) {
-    on<AddTodoEvent>((event, emit) async {
+    on<TodoListFetchEvent>((event, emit) async {
+      await _onFetch(event, emit);
+    });
+
+    on<TodoListAddEvent>((event, emit) async {
       await _onAdd(event, emit);
     });
 
-    on<DeleteTodoEvent>((event, emit) async {
+    on<TodoListDeleteEvent>((event, emit) async {
       await _onDelete(event, emit);
     });
 
-    on<ToggleTodoEvent>((event, emit) async {
+    on<TodoListToggleEvent>((event, emit) async {
       await _onToggle(event, emit);
     });
   }
 
-  _onAdd(AddTodoEvent event, Emitter<TodoListState> emit) async {
+  _onFetch(TodoListFetchEvent event, Emitter<TodoListState> emit) async {
+    print("fetching todo list with id: ${event.todoListId}");
+  }
+
+  _onAdd(TodoListAddEvent event, Emitter<TodoListState> emit) async {
     if (event.title.isEmpty ||
         RegExp(r"^\s*$").firstMatch(event.title) != null) {
       return;
@@ -59,13 +67,13 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
     ));
   }
 
-  _onDelete(DeleteTodoEvent event, Emitter<TodoListState> emit) async {
+  _onDelete(TodoListDeleteEvent event, Emitter<TodoListState> emit) async {
     emit(state.copyWith(
       items: state.items.where((item) => item.id != event.id).toList(),
     ));
   }
 
-  _onToggle(ToggleTodoEvent event, Emitter<TodoListState> emit) async {
+  _onToggle(TodoListToggleEvent event, Emitter<TodoListState> emit) async {
     emit(state.copyWith(
       items: state.items.map((item) {
         if (item.id == event.id) {
