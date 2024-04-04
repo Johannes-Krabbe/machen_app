@@ -57,4 +57,48 @@ class TodoListRepository extends ApiProvider {
     }
     return ListGetResponse(success: false, messsage: 'Unknown error');
   }
+
+  Future<bool> create(
+      String token, String listId, String title, String description) async {
+    try {
+      await dio.post("/list-item/create",
+          data: {
+            "title": title,
+            "listId": listId,
+            "description": description,
+          },
+          options: Options(headers: {"authorization": "Bearer $token"}));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  Future<bool> delete(String token, String id) async {
+    try {
+      await dio.delete("/list-item/$id",
+          options: Options(headers: {"authorization": "Bearer $token"}));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  Future<bool> update(String token, String? itemId, String? title,
+      String? description, bool? completed) async {
+    try {
+      await dio.post(
+        "/list-item/update/$itemId",
+        options: Options(headers: {"authorization": "Bearer $token"}),
+        data: {
+          "title": title,
+          "description": description,
+          "completed": completed,
+        },
+      );
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 }

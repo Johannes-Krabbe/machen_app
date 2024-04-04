@@ -10,11 +10,12 @@ class TodoListState {
   });
 
   TodoListState copyWith({
+    String? id,
     List<TodoListItemModel>? items,
   }) {
     return TodoListState(
       items: items ?? this.items,
-      id: id,
+      id: id ?? this.id,
     );
   }
 }

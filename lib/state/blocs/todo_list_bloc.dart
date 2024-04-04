@@ -57,14 +57,10 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
   }
 
   _onFetch(TodoListFetchEvent event, Emitter<TodoListState> emit) async {
-    var getListResponse =
-        await TodoListRepository().getList(event.token, event.todoListId);
-
-    if (getListResponse.success == true && getListResponse.list != null) {
-      emit(state.copyWith(
-        items: getListResponse.list!.listItems,
-      ));
-    }
+    emit(state.copyWith(
+      id: event.todoListId,
+    ));
+    await _refetch(event.token, emit);
   }
 
   _onAdd(TodoListAddEvent event, Emitter<TodoListState> emit) async {
@@ -72,28 +68,95 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
         RegExp(r"^\s*$").firstMatch(event.title) != null) {
       return;
     }
+
+    var tempId = DateTime.now().toString();
+
     emit(state.copyWith(
       items: [
         ...state.items,
-        TodoListItemModel(title: event.title, id: DateTime.now().toString()),
+        TodoListItemModel(title: event.title, id: tempId),
       ],
     ));
+
+    var success = await TodoListRepository()
+        .create(event.token, state.id, event.title, '');
+    if (!success) {
+      emit(state.copyWith(
+        items: state.items.where((item) => item.id != tempId).toList(),
+      ));
+    } else {
+      await _refetch(event.token, emit);
+    }
   }
 
   _onDelete(TodoListDeleteEvent event, Emitter<TodoListState> emit) async {
+    var tmpItem = state.items.where((item) => item.id == event.id).first;
+
     emit(state.copyWith(
       items: state.items.where((item) => item.id != event.id).toList(),
     ));
+
+    var success = await TodoListRepository().delete(event.token, event.id);
+    if (!success) {
+      emit(state.copyWith(
+        items: [...state.items, tmpItem],
+      ));
+    }
+    await _refetch(event.token, emit);
   }
 
   _onToggle(TodoListToggleEvent event, Emitter<TodoListState> emit) async {
+    var completed =
+        (state.items.where((item) => item.id == event.id).first.completed) ??
+            false;
+
     emit(state.copyWith(
       items: state.items.map((item) {
         if (item.id == event.id) {
-          return item.copyWith(completed: !(item.completed ?? true));
+          return item.copyWith(completed: !completed);
         }
         return item;
       }).toList(),
     ));
+
+    var getListResponse = await TodoListRepository()
+        .update(event.token, event.id, null, null, !completed);
+
+    if (getListResponse == false) {
+      emit(state.copyWith(
+        items: state.items.map((item) {
+          if (item.id == event.id) {
+            return item.copyWith(completed: completed);
+          }
+          return item;
+        }).toList(),
+      ));
+    }
+
+    await _refetch(event.token, emit);
+  }
+
+  _refetch(String token, Emitter<TodoListState> emit) async {
+    var getListResponse = await TodoListRepository().getList(token, state.id);
+
+    if (getListResponse.success == true && getListResponse.list != null) {
+      var completed = getListResponse.list!.listItems
+          ?.where((item) => item.completed == true)
+          .toList();
+
+      var uncompleted = getListResponse.list!.listItems
+          ?.where((item) => item.completed == false)
+          .toList();
+
+      completed?.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
+      uncompleted?.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
+
+      emit(state.copyWith(
+        items: [
+          ...uncompleted ?? [],
+          ...completed ?? [],
+        ],
+      ));
+    }
   }
 }
