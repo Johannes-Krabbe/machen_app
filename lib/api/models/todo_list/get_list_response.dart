@@ -2,29 +2,27 @@
 
 import 'package:machen_app/api/models/todo_list/todo_list_model.dart';
 
-class ListsGetResponse {
+class ListGetResponse {
   bool? success;
   String? messsage;
   String? code;
 
-  List<TodoListModel>? lists;
+  TodoListModel? list;
 
-  ListsGetResponse({
+  ListGetResponse({
     this.success,
     this.messsage,
     this.code,
+    this.list,
   });
 
-  ListsGetResponse.fromJson(Map<String, dynamic> json) {
+  ListGetResponse.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     messsage = json['message'];
     code = json['code'];
 
-    if (json['lists'] != null) {
-      lists = <TodoListModel>[];
-      json['lists'].forEach((v) {
-        lists!.add(TodoListModel.fromJson(v));
-      });
+    if (json['list'] != null) {
+      list = TodoListModel.fromJson(json['list']);
     }
   }
 }

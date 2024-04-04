@@ -1,3 +1,4 @@
+import 'package:machen_app/api/models/todo_list/todo_list_item_model.dart';
 import 'package:machen_app/api/models/todo_list/todo_list_permission_model.dart';
 
 class TodoListModel {
@@ -7,6 +8,7 @@ class TodoListModel {
   String? description;
   bool? deletable;
   List<ListPermissionModel>? listPermissions;
+  List<TodoListItemModel>? listItems;
 
   // Null? folderId;
   // Null? folder;
@@ -18,6 +20,7 @@ class TodoListModel {
     this.description,
     this.deletable,
     this.listPermissions,
+    this.listItems,
   });
 
   TodoListModel.fromJson(Map<String, dynamic> json) {
@@ -30,6 +33,12 @@ class TodoListModel {
       listPermissions = <ListPermissionModel>[];
       json['listPermissions'].forEach((v) {
         listPermissions!.add(ListPermissionModel.fromJson(v));
+      });
+    }
+    if (json['listItems'] != null) {
+      listItems = <TodoListItemModel>[];
+      json['listItems'].forEach((v) {
+        listItems!.add(TodoListItemModel.fromJson(v));
       });
     }
   }

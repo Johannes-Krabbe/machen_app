@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:machen_app/components/task_tile.dart';
+import 'package:machen_app/state/blocs/auth_bloc.dart';
 import 'package:machen_app/state/blocs/todo_list_bloc.dart';
 
 class TodoListScreen extends StatefulWidget {
@@ -18,13 +19,21 @@ class _TodoListScreenState extends State<TodoListScreen> {
 
   @override
   void initState() {
+    var authBloc = context.read<AuthBloc>();
+    context
+        .read<TodoListBloc>()
+        .add(TodoListFetchEvent(authBloc.state.token, widget.todoListId));
+
     super.initState();
-    context.read<TodoListBloc>().add(TodoListFetchEvent(widget.todoListId));
   }
 
   @override
   Widget build(BuildContext context) {
-    widget.todoListId;
+    var authBloc = context.read<AuthBloc>();
+    context
+        .read<TodoListBloc>()
+        .add(TodoListFetchEvent(authBloc.state.token, widget.todoListId));
+
     return Builder(
       builder: (context) {
         return Scaffold(
@@ -39,20 +48,27 @@ class _TodoListScreenState extends State<TodoListScreen> {
                       ...todoListBloc.state.items
                           .map(
                             (e) => Dismissible(
-                              key: Key(e.id),
+                              key: Key(e.id ?? ''),
                               onDismissed: (direction) {
-                                todoListBloc.add(TodoListDeleteEvent(e.id));
+                                if (e.id != null) {
+                                  todoListBloc.add(TodoListDeleteEvent(
+                                    authBloc.state.token,
+                                    e.id!,
+                                  ));
+                                }
                               },
                               background: Container(
                                 color: Colors.red,
                                 child: const Icon(Icons.delete),
                               ),
                               child: TaskTile(
-                                  title: e.title,
-                                  isDone: e.isDone,
+                                  title: e.title ?? '',
+                                  isDone: e.completed ?? false,
                                   onChanged: (value) => {
-                                        todoListBloc
-                                            .add(TodoListToggleEvent(e.id))
+                                        todoListBloc.add(TodoListToggleEvent(
+                                          authBloc.state.token,
+                                          e.id ?? '',
+                                        ))
                                       }),
                             ),
                           )
@@ -81,9 +97,8 @@ class _TodoListScreenState extends State<TodoListScreen> {
                     IconButton(
                         icon: const Icon(Icons.send),
                         onPressed: () {
-                          context
-                              .read<TodoListBloc>()
-                              .add(TodoListAddEvent(_controller.text));
+                          context.read<TodoListBloc>().add(TodoListAddEvent(
+                              authBloc.state.token, _controller.text));
                           _controller.clear();
                         }),
                     const SizedBox(width: 15),

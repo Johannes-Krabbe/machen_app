@@ -1,6 +1,8 @@
+import 'package:machen_app/api/models/todo_list/todo_list_item_model.dart';
+
 class TodoListState {
   final String id;
-  final List<TodoItemState> items;
+  final List<TodoListItemModel> items;
 
   TodoListState({
     required this.id,
@@ -8,34 +10,11 @@ class TodoListState {
   });
 
   TodoListState copyWith({
-    List<TodoItemState>? items,
+    List<TodoListItemModel>? items,
   }) {
     return TodoListState(
       items: items ?? this.items,
       id: id,
-    );
-  }
-}
-
-class TodoItemState {
-  final String title;
-  final bool isDone;
-  final String id;
-
-  TodoItemState({
-    required this.title,
-    required this.id,
-    this.isDone = false,
-  });
-
-  TodoItemState copyWith({
-    String? title,
-    bool? isDone,
-  }) {
-    return TodoItemState(
-      title: title ?? this.title,
-      id: id,
-      isDone: isDone ?? this.isDone,
     );
   }
 }

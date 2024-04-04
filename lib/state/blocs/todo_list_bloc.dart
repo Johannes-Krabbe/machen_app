@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:machen_app/api/models/todo_list/todo_list_item_model.dart';
+import 'package:machen_app/api/repositories/todo_list_repository.dart';
 import 'package:machen_app/state/types/todo_list_state.dart';
 
 // Events
@@ -6,27 +8,31 @@ import 'package:machen_app/state/types/todo_list_state.dart';
 sealed class TodoListEvent {}
 
 final class TodoListFetchEvent extends TodoListEvent {
+  final String token;
   final String todoListId;
 
-  TodoListFetchEvent(this.todoListId);
+  TodoListFetchEvent(this.token, this.todoListId);
 }
 
 final class TodoListAddEvent extends TodoListEvent {
+  final String token;
   final String title;
 
-  TodoListAddEvent(this.title);
+  TodoListAddEvent(this.token, this.title);
 }
 
 final class TodoListDeleteEvent extends TodoListEvent {
+  final String token;
   final String id;
 
-  TodoListDeleteEvent(this.id);
+  TodoListDeleteEvent(this.token, this.id);
 }
 
 final class TodoListToggleEvent extends TodoListEvent {
+  final String token;
   final String id;
 
-  TodoListToggleEvent(this.id);
+  TodoListToggleEvent(this.token, this.id);
 }
 
 // Bloc
@@ -51,7 +57,14 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
   }
 
   _onFetch(TodoListFetchEvent event, Emitter<TodoListState> emit) async {
-    print("fetching todo list with id: ${event.todoListId}");
+    var getListResponse =
+        await TodoListRepository().getList(event.token, event.todoListId);
+
+    if (getListResponse.success == true && getListResponse.list != null) {
+      emit(state.copyWith(
+        items: getListResponse.list!.listItems,
+      ));
+    }
   }
 
   _onAdd(TodoListAddEvent event, Emitter<TodoListState> emit) async {
@@ -62,7 +75,7 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
     emit(state.copyWith(
       items: [
         ...state.items,
-        TodoItemState(title: event.title, id: DateTime.now().toString()),
+        TodoListItemModel(title: event.title, id: DateTime.now().toString()),
       ],
     ));
   }
@@ -77,7 +90,7 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
     emit(state.copyWith(
       items: state.items.map((item) {
         if (item.id == event.id) {
-          return item.copyWith(isDone: !item.isDone);
+          return item.copyWith(completed: !(item.completed ?? true));
         }
         return item;
       }).toList(),
