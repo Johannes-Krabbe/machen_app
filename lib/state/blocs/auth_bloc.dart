@@ -56,7 +56,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _onFetchMe(event, emit);
     });
     on<ChangePageAuthEvent>((event, emit) async {
-      emit(state.copyWith(pageState: event.pageState));
+      emit(AuthState(pageState: event.pageState, state: AuthStateEnum.none));
     });
   }
 

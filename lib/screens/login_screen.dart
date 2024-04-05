@@ -11,7 +11,8 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _emailUsernameController =
+      TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
@@ -29,14 +30,14 @@ class _LoginState extends State<Login> {
           child: Column(
             children: [
               TextFormField(
-                controller: _emailController,
+                controller: _emailUsernameController,
                 decoration: const InputDecoration(
-                  hintText: "Enter you Email",
+                  hintText: "Enter your Email or Username",
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
+                    return 'Please enter your email or username';
                   }
                   return null;
                 },
@@ -46,7 +47,7 @@ class _LoginState extends State<Login> {
                 controller: _passwordController,
                 obscureText: true,
                 decoration: const InputDecoration(
-                  hintText: "Enter you Password",
+                  hintText: "Enter your Password",
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
@@ -64,7 +65,8 @@ class _LoginState extends State<Login> {
                   return const Center(child: CircularProgressIndicator());
                 } else if (authBloc.state.state == AuthStateEnum.failure) {
                   return Center(
-                    child: Text(authBloc.state.error ?? 'Unknown error'),
+                    child: Text(authBloc.state.error ?? 'Unknown error',
+                        style: const TextStyle(color: Colors.red)),
                   );
                 }
                 return const SizedBox.shrink();
@@ -76,7 +78,7 @@ class _LoginState extends State<Login> {
                   var authBloc = context.read<AuthBloc>();
                   authBloc.add(ChangePageAuthEvent(AuthPageStateEnum.signup));
                 },
-                child: const Text('Don\'t have an account? Sign up'),
+                child: const Text('Don\'t have an account? Create one here!'),
               ),
               TextButton(
                 onPressed: () {
@@ -84,7 +86,7 @@ class _LoginState extends State<Login> {
                     var authBloc = context.read<AuthBloc>();
                     authBloc.add(
                       LoginAuthEvent(
-                        _emailController.text,
+                        _emailUsernameController.text,
                         _passwordController.text,
                       ),
                     );

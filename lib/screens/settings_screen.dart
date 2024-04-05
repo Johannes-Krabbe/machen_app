@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:machen_app/api/models/user/update_response.dart';
 import 'package:machen_app/api/repositories/user_repository.dart';
 import 'package:machen_app/components/input_tile.dart';
@@ -70,6 +71,17 @@ class _SettingsState extends State<Settings> {
                 updateFunc: (String name) {
                   return updateFunc(null, name, null);
                 }),
+            const Spacer(),
+            SafeArea(
+              child: TextButton(
+                onPressed: () {
+                  authBloc.add(LogoutAuthEvent());
+                  Navigator.pop(context);
+                },
+                child: const Text('Logout',
+                    style: TextStyle(fontSize: 25, color: Colors.red)),
+              ),
+            )
           ],
         ),
       ),

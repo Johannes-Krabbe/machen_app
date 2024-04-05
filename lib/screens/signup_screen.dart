@@ -98,13 +98,22 @@ class _SignupState extends State<Signup> {
                   return const Center(child: CircularProgressIndicator());
                 } else if (authBloc.state.state == AuthStateEnum.failure) {
                   return Center(
-                    child: Text(authBloc.state.error ?? 'Unknown error'),
+                    child: Text(authBloc.state.error ?? 'Unknown error',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.red)),
                   );
                 } else {
                   return const SizedBox.shrink();
                 }
               }),
               const Spacer(),
+              TextButton(
+                onPressed: () {
+                  var authBloc = context.read<AuthBloc>();
+                  authBloc.add(ChangePageAuthEvent(AuthPageStateEnum.login));
+                },
+                child: const Text('Already have an account? Login'),
+              ),
               TextButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
@@ -115,7 +124,8 @@ class _SignupState extends State<Signup> {
                     );
                   }
                 },
-                child: const Text('Signup', style: TextStyle(fontSize: 30)),
+                child: const Text('Create new Account',
+                    style: TextStyle(fontSize: 30)),
               ),
               const SizedBox(height: 20),
             ],
