@@ -71,13 +71,14 @@ class _MyAppState extends State<MyApp> {
                 Provider(
                   create: (_) => TodoListBloc(),
                   child: ListSettingsSheet(
-                      todoListId: selectedRoute.id,
-                      onDelete: () {
-                        var authBloc = context.read<AuthBloc>();
-                        _selectIndex(0);
-                        todoListsBloc
-                            .add(TodoListsResetEvent(authBloc.state.token));
-                      }),
+                    todoListId: selectedRoute.id,
+                    onDelete: () {
+                      var authBloc = context.read<AuthBloc>();
+                      _selectIndex(0);
+                      todoListsBloc
+                          .add(TodoListsResetEvent(authBloc.state.token));
+                    },
+                  ),
                 ),
               ],
             ),
@@ -85,8 +86,9 @@ class _MyAppState extends State<MyApp> {
             drawer: Drawer(
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(0),
-                    bottomRight: Radius.circular(0)),
+                  topRight: Radius.circular(0),
+                  bottomRight: Radius.circular(0),
+                ),
               ),
               child: Container(
                 color: Theme.of(context).scaffoldBackgroundColor,
