@@ -2,6 +2,7 @@ import 'package:machen_app/api/api_provider.dart';
 import 'package:machen_app/api/models/todo_list/get_list_response.dart';
 import 'package:machen_app/api/models/todo_list/get_lists_response.dart';
 import 'package:dio/dio.dart';
+import 'package:machen_app/api/models/todo_list/update_list_response.dart';
 
 class TodoListRepository extends ApiProvider {
   Future<ListsGetResponse> getLists(String token) async {
@@ -38,6 +39,39 @@ class TodoListRepository extends ApiProvider {
       return true;
     } catch (error) {
       return false;
+    }
+  }
+
+  Future<bool> createList(String token, String name, String description) async {
+    try {
+      await dio.post("/list/create",
+          data: {
+            "name": name,
+            "description": description,
+          },
+          options: Options(headers: {"authorization": "Bearer $token"}));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  Future<ListUpdateResponse> updateList(
+      String token, String listId, String? name, String? description) async {
+    try {
+      await dio.post("/list/update/$listId",
+          data: {
+            "name": name,
+            "description": description,
+          },
+          options: Options(headers: {"authorization": "Bearer $token"}));
+      return ListUpdateResponse(success: true);
+    } catch (error) {
+      if (error is DioException) {
+        return ListUpdateResponse(
+            success: false, messsage: error.response?.data["message"]);
+      }
+      return ListUpdateResponse(success: false);
     }
   }
 
