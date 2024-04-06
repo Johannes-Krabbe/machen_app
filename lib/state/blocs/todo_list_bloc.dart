@@ -14,45 +14,55 @@ final class TodoListFetchEvent extends TodoListEvent {
   TodoListFetchEvent(this.token, this.todoListId);
 }
 
-final class TodoListAddEvent extends TodoListEvent {
+final class TodoListDeleteListEvent extends TodoListEvent {
+  final String token;
+
+  TodoListDeleteListEvent(this.token);
+}
+
+final class TodoListAddItemEvent extends TodoListEvent {
   final String token;
   final String title;
 
-  TodoListAddEvent(this.token, this.title);
+  TodoListAddItemEvent(this.token, this.title);
 }
 
-final class TodoListDeleteEvent extends TodoListEvent {
+final class TodoListDeleteItemEvent extends TodoListEvent {
   final String token;
   final String id;
 
-  TodoListDeleteEvent(this.token, this.id);
+  TodoListDeleteItemEvent(this.token, this.id);
 }
 
-final class TodoListToggleEvent extends TodoListEvent {
+final class TodoListToggleItemEvent extends TodoListEvent {
   final String token;
   final String id;
 
-  TodoListToggleEvent(this.token, this.id);
+  TodoListToggleItemEvent(this.token, this.id);
 }
 
 // Bloc
 
 class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
-  TodoListBloc() : super(TodoListState(id: '', items: [])) {
+  TodoListBloc() : super(TodoListState(id: '', items: [], list: null)) {
     on<TodoListFetchEvent>((event, emit) async {
       await _onFetch(event, emit);
     });
 
-    on<TodoListAddEvent>((event, emit) async {
-      await _onAdd(event, emit);
+    on<TodoListAddItemEvent>((event, emit) async {
+      await _onAddItem(event, emit);
     });
 
-    on<TodoListDeleteEvent>((event, emit) async {
-      await _onDelete(event, emit);
+    on<TodoListDeleteItemEvent>((event, emit) async {
+      await _onDeleteItem(event, emit);
     });
 
-    on<TodoListToggleEvent>((event, emit) async {
-      await _onToggle(event, emit);
+    on<TodoListToggleItemEvent>((event, emit) async {
+      await _onToggleItem(event, emit);
+    });
+
+    on<TodoListDeleteListEvent>((event, emit) async {
+      await _onDeleteList(event, emit);
     });
   }
 
@@ -63,7 +73,7 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
     await _refetch(event.token, emit);
   }
 
-  _onAdd(TodoListAddEvent event, Emitter<TodoListState> emit) async {
+  _onAddItem(TodoListAddItemEvent event, Emitter<TodoListState> emit) async {
     if (event.title.isEmpty ||
         RegExp(r"^\s*$").firstMatch(event.title) != null) {
       return;
@@ -89,7 +99,8 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
     }
   }
 
-  _onDelete(TodoListDeleteEvent event, Emitter<TodoListState> emit) async {
+  _onDeleteItem(
+      TodoListDeleteItemEvent event, Emitter<TodoListState> emit) async {
     var tmpItem = state.items.where((item) => item.id == event.id).first;
 
     emit(state.copyWith(
@@ -105,7 +116,8 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
     await _refetch(event.token, emit);
   }
 
-  _onToggle(TodoListToggleEvent event, Emitter<TodoListState> emit) async {
+  _onToggleItem(
+      TodoListToggleItemEvent event, Emitter<TodoListState> emit) async {
     var completed =
         (state.items.where((item) => item.id == event.id).first.completed) ??
             false;
@@ -136,6 +148,20 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
     await _refetch(event.token, emit);
   }
 
+  _onDeleteList(
+      TodoListDeleteListEvent event, Emitter<TodoListState> emit) async {
+    var deleteListResponse =
+        await TodoListRepository().delete(event.token, state.id);
+
+    if (deleteListResponse == true) {
+      emit(state.copyWith(
+        items: [],
+        list: null,
+      ));
+    }
+    await _refetch(event.token, emit);
+  }
+
   _refetch(String token, Emitter<TodoListState> emit) async {
     var getListResponse = await TodoListRepository().getList(token, state.id);
 
@@ -156,6 +182,7 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
           ...uncompleted ?? [],
           ...completed ?? [],
         ],
+        list: getListResponse.list,
       ));
     }
   }

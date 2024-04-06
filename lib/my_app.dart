@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:machen_app/components/list_settings_sheet.dart';
 import 'package:machen_app/screens/settings_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:machen_app/screens/todo_list_screen.dart';
 import 'package:machen_app/state/blocs/auth_bloc.dart';
 import 'package:machen_app/state/blocs/todo_list_bloc.dart';
 import 'package:machen_app/state/blocs/todo_lists_bloc.dart';
+import 'package:provider/provider.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -34,21 +36,30 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     var authBloc = context.watch<AuthBloc>();
-    var todoListBloc = context.watch<TodoListsBloc>();
+    var todoListsBloc = context.watch<TodoListsBloc>();
 
-    final List<AppRoute> todoListRoutes = todoListBloc.state.lists
+    final List<AppRoute> todoListRoutes = todoListsBloc.state.lists
         .map(
           (e) => AppRoute(
-              widget: BlocProvider(
-                  create: (_) => TodoListBloc(),
-                  child: TodoListScreen(todoListId: e.id ?? '')),
-              title: e.name ?? ''),
+            widget: BlocProvider(
+                create: (_) => TodoListBloc(),
+                child: TodoListScreen(todoListId: e.id ?? '')),
+            id: e.id ?? '',
+            title: e.name ?? '',
+            createdAt: e.createdAt ?? '',
+          ),
         )
         .toList();
 
+    todoListRoutes.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
     final AppRoute selectedRoute = todoListRoutes.isEmpty
         ? AppRoute(
-            widget: const Center(child: CircularProgressIndicator()), title: "")
+            widget: const Center(child: CircularProgressIndicator()),
+            title: "",
+            createdAt: '',
+            id: '',
+          )
         : todoListRoutes[_selectedIndex];
 
     return Container(
@@ -58,6 +69,14 @@ class _MyAppState extends State<MyApp> {
         child: Scaffold(
             appBar: AppBar(
               title: Text(selectedRoute.title),
+              actions: <Widget>[
+                Provider(
+                  create: (_) => TodoListBloc(),
+                  child: ListSettingsSheet(
+                    todoListId: selectedRoute.id,
+                  ),
+                ),
+              ],
             ),
             body: selectedRoute.widget,
             drawer: Drawer(
@@ -142,5 +161,12 @@ class _MyAppState extends State<MyApp> {
 class AppRoute {
   Widget widget;
   String title;
-  AppRoute({required this.widget, required this.title});
+  String id = '';
+  String createdAt;
+  AppRoute({
+    required this.widget,
+    required this.title,
+    required this.createdAt,
+    required this.id,
+  });
 }

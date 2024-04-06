@@ -51,7 +51,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                               key: Key(e.id ?? ''),
                               onDismissed: (direction) {
                                 if (e.id != null) {
-                                  todoListBloc.add(TodoListDeleteEvent(
+                                  todoListBloc.add(TodoListDeleteItemEvent(
                                     authBloc.state.token,
                                     e.id!,
                                   ));
@@ -65,7 +65,8 @@ class _TodoListScreenState extends State<TodoListScreen> {
                                   title: e.title ?? '',
                                   isDone: e.completed ?? false,
                                   onChanged: (value) => {
-                                        todoListBloc.add(TodoListToggleEvent(
+                                        todoListBloc
+                                            .add(TodoListToggleItemEvent(
                                           authBloc.state.token,
                                           e.id ?? '',
                                         ))
@@ -97,7 +98,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
                     IconButton(
                         icon: const Icon(Icons.send),
                         onPressed: () {
-                          context.read<TodoListBloc>().add(TodoListAddEvent(
+                          context.read<TodoListBloc>().add(TodoListAddItemEvent(
                               authBloc.state.token, _controller.text));
                           _controller.clear();
                         }),
