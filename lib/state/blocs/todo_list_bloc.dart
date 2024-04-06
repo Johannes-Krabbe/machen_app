@@ -89,7 +89,7 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
     ));
 
     var success = await TodoListRepository()
-        .create(event.token, state.id, event.title, '');
+        .createItem(event.token, state.id, event.title, '');
     if (!success) {
       emit(state.copyWith(
         items: state.items.where((item) => item.id != tempId).toList(),
@@ -107,7 +107,7 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
       items: state.items.where((item) => item.id != event.id).toList(),
     ));
 
-    var success = await TodoListRepository().delete(event.token, event.id);
+    var success = await TodoListRepository().deleteItem(event.token, event.id);
     if (!success) {
       emit(state.copyWith(
         items: [...state.items, tmpItem],
@@ -132,7 +132,7 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
     ));
 
     var getListResponse = await TodoListRepository()
-        .update(event.token, event.id, null, null, !completed);
+        .updateItem(event.token, event.id, null, null, !completed);
 
     if (getListResponse == false) {
       emit(state.copyWith(
@@ -151,12 +151,13 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
   _onDeleteList(
       TodoListDeleteListEvent event, Emitter<TodoListState> emit) async {
     var deleteListResponse =
-        await TodoListRepository().delete(event.token, state.id);
+        await TodoListRepository().deleteList(event.token, state.id);
 
     if (deleteListResponse == true) {
       emit(state.copyWith(
         items: [],
         list: null,
+        isDeleted: true,
       ));
     }
     await _refetch(event.token, emit);

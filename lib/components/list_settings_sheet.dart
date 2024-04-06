@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:machen_app/state/blocs/auth_bloc.dart';
 import 'package:machen_app/state/blocs/todo_list_bloc.dart';
+import 'package:machen_app/state/blocs/todo_lists_bloc.dart';
 
 class ListSettingsSheet extends StatefulWidget {
   final String todoListId;
+  final Function onDelete;
 
-  const ListSettingsSheet({Key? key, required this.todoListId})
+  const ListSettingsSheet(
+      {Key? key, required this.todoListId, required this.onDelete})
       : super(key: key);
 
   @override
@@ -48,6 +51,21 @@ class _ListSettingsSheetState extends State<ListSettingsSheet> {
                       '${(todoListBloc.state.list?.name ?? '')} Settings',
                       style: const TextStyle(fontSize: 24),
                     ),
+                    const Spacer(),
+                    SafeArea(
+                      child: TextButton(
+                        onPressed: () {
+                          todoListBloc.add(
+                            TodoListDeleteListEvent(authBloc.state.token),
+                          );
+                          widget.onDelete();
+
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Delete List',
+                            style: TextStyle(fontSize: 25, color: Colors.red)),
+                      ),
+                    )
                   ],
                 ),
               ),

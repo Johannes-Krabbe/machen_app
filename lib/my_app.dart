@@ -6,6 +6,7 @@ import 'package:machen_app/screens/todo_list_screen.dart';
 import 'package:machen_app/state/blocs/auth_bloc.dart';
 import 'package:machen_app/state/blocs/todo_list_bloc.dart';
 import 'package:machen_app/state/blocs/todo_lists_bloc.dart';
+import 'package:machen_app/state/types/todo_lists_state.dart';
 import 'package:provider/provider.dart';
 
 class MyApp extends StatefulWidget {
@@ -18,25 +19,22 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   int _selectedIndex = 0;
 
-  void _onItemTapped(int index) {
+  void _selectIndex(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
   @override
-  void initState() {
-    var todoListBloc = context.read<TodoListsBloc>();
-    var authBloc = context.read<AuthBloc>();
-    todoListBloc.add(TodoListsLoadEvent(authBloc.state.token));
-
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     var authBloc = context.watch<AuthBloc>();
     var todoListsBloc = context.watch<TodoListsBloc>();
+
+    if (todoListsBloc.state.status == TodoListStatus.initial) {
+      todoListsBloc.add(
+        TodoListsLoadEvent(authBloc.state.token),
+      );
+    }
 
     final List<AppRoute> todoListRoutes = todoListsBloc.state.lists
         .map(
@@ -73,8 +71,13 @@ class _MyAppState extends State<MyApp> {
                 Provider(
                   create: (_) => TodoListBloc(),
                   child: ListSettingsSheet(
-                    todoListId: selectedRoute.id,
-                  ),
+                      todoListId: selectedRoute.id,
+                      onDelete: () {
+                        var authBloc = context.read<AuthBloc>();
+                        _selectIndex(0);
+                        todoListsBloc
+                            .add(TodoListsResetEvent(authBloc.state.token));
+                      }),
                 ),
               ],
             ),
@@ -143,7 +146,7 @@ class _MyAppState extends State<MyApp> {
                               title: Text(e.value.title),
                               selected: e.key == _selectedIndex,
                               onTap: () {
-                                _onItemTapped(e.key);
+                                _selectIndex(e.key);
                                 Navigator.pop(context);
                               },
                             ))

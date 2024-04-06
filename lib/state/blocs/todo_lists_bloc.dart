@@ -12,20 +12,33 @@ class TodoListsLoadEvent extends TodoListsEvent {
   TodoListsLoadEvent(this.token);
 }
 
+class TodoListsResetEvent extends TodoListsEvent {
+  final String token;
+
+  TodoListsResetEvent(this.token);
+}
+
 // Bloc
 
 class TodoListsBloc extends Bloc<TodoListsEvent, TodoListsState> {
-  TodoListsBloc() : super(TodoListsState(lists: [])) {
+  TodoListsBloc()
+      : super(TodoListsState(lists: [], status: TodoListStatus.initial)) {
     on<TodoListsLoadEvent>((event, emit) async {
       await _onLoad(event, emit);
+    });
+
+    on<TodoListsResetEvent>((event, emit) async {
+      emit(TodoListsState(lists: [], status: TodoListStatus.initial));
     });
   }
 
   _onLoad(TodoListsLoadEvent event, Emitter<TodoListsState> emit) async {
+    emit(TodoListsState(lists: [], status: TodoListStatus.loading));
     TodoListRepository repository = TodoListRepository();
     var getListsResponse = await repository.getLists(event.token);
     if (getListsResponse.success == true) {
-      emit(TodoListsState(lists: getListsResponse.lists ?? []));
+      emit(TodoListsState(
+          lists: getListsResponse.lists ?? [], status: TodoListStatus.loaded));
     }
   }
 }

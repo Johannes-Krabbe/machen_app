@@ -31,6 +31,16 @@ class TodoListRepository extends ApiProvider {
     return ListsGetResponse(success: false, messsage: 'Unknown error');
   }
 
+  Future<bool> deleteList(String token, String listId) async {
+    try {
+      await dio.delete("/list/$listId",
+          options: Options(headers: {"authorization": "Bearer $token"}));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   Future<ListGetResponse> getList(String token, String listId) async {
     try {
       Response response = await dio.get("/list-item/$listId",
@@ -58,7 +68,7 @@ class TodoListRepository extends ApiProvider {
     return ListGetResponse(success: false, messsage: 'Unknown error');
   }
 
-  Future<bool> create(
+  Future<bool> createItem(
       String token, String listId, String title, String description) async {
     try {
       await dio.post("/list-item/create",
@@ -74,7 +84,7 @@ class TodoListRepository extends ApiProvider {
     }
   }
 
-  Future<bool> delete(String token, String id) async {
+  Future<bool> deleteItem(String token, String id) async {
     try {
       await dio.delete("/list-item/$id",
           options: Options(headers: {"authorization": "Bearer $token"}));
@@ -84,7 +94,7 @@ class TodoListRepository extends ApiProvider {
     }
   }
 
-  Future<bool> update(String token, String? itemId, String? title,
+  Future<bool> updateItem(String token, String? itemId, String? title,
       String? description, bool? completed) async {
     try {
       await dio.post(
