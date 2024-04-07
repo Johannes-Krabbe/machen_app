@@ -44,7 +44,7 @@ class _SignupState extends State<Signup> {
                   return null;
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
               TextFormField(
                 controller: _emailController,
                 decoration: const InputDecoration(
@@ -58,7 +58,7 @@ class _SignupState extends State<Signup> {
                   return null;
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
               TextFormField(
                 controller: _passwordController,
                 obscureText: true,
@@ -73,7 +73,7 @@ class _SignupState extends State<Signup> {
                   return null;
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
               TextFormField(
                 controller: _repeatPasswordController,
                 obscureText: true,
@@ -91,22 +91,7 @@ class _SignupState extends State<Signup> {
                   return null;
                 },
               ),
-              const SizedBox(height: 24),
-              Builder(builder: (context) {
-                var authBloc = context.watch<AuthBloc>();
-                if (authBloc.state.state == AuthStateEnum.loading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (authBloc.state.state == AuthStateEnum.failure) {
-                  return Center(
-                    child: Text(authBloc.state.error ?? 'Unknown error',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.red)),
-                  );
-                } else {
-                  return const SizedBox.shrink();
-                }
-              }),
-              const Spacer(),
+              const SizedBox(height: 10),
               TextButton(
                 onPressed: () {
                   var authBloc = context.read<AuthBloc>();
@@ -114,21 +99,51 @@ class _SignupState extends State<Signup> {
                 },
                 child: const Text('Already have an account? Login'),
               ),
-              TextButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    var authBloc = context.read<AuthBloc>();
-                    authBloc.add(
-                      SignupAuthEvent(_usernameController.text,
-                          _emailController.text, _passwordController.text),
-                    );
-                  }
-                },
-                child: const Text('Create new Account',
-                    style: TextStyle(fontSize: 30)),
-              ),
-              const SizedBox(height: 20),
+              Builder(builder: (context) {
+                var authBloc = context.watch<AuthBloc>();
+                if (authBloc.state.state == AuthStateEnum.loading) {
+                  return const Center(
+                      child: Column(
+                    children: [
+                      SizedBox(height: 10),
+                      CircularProgressIndicator(),
+                    ],
+                  ));
+                } else if (authBloc.state.state == AuthStateEnum.failure) {
+                  return Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      Center(
+                        child: Text(authBloc.state.error ?? 'Unknown error',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(color: Colors.red)),
+                      ),
+                    ],
+                  );
+                } else {
+                  return const SizedBox.shrink();
+                }
+              }),
             ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        elevation: 0,
+        color: Colors.transparent,
+        child: TextButton(
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              var authBloc = context.read<AuthBloc>();
+              authBloc.add(
+                SignupAuthEvent(_usernameController.text, _emailController.text,
+                    _passwordController.text),
+              );
+            }
+          },
+          child: const Text(
+            'Create new Account',
+            style: TextStyle(fontSize: 25),
           ),
         ),
       ),

@@ -101,22 +101,28 @@ class InputTile extends StatelessWidget {
               ? Colors.black12
               : Colors.white12,
         ),
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.all(10),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const SizedBox(width: 15),
             Text(
               title,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            const Spacer(),
-            Text(
-              value,
-              style: const TextStyle(fontSize: 20, color: Colors.grey),
+            Row(
+              children: [
+                Text(
+                  value,
+                  style: const TextStyle(color: Colors.grey),
+                  softWrap: false,
+                  overflow: TextOverflow.clip,
+                ),
+                const SizedBox(width: 5),
+                const Icon(Icons.arrow_forward_ios,
+                    size: 20, color: Colors.grey),
+              ],
             ),
-            const SizedBox(width: 10),
-            const Icon(Icons.arrow_forward_ios, size: 20, color: Colors.grey),
-            const SizedBox(width: 15),
+            //
           ],
         ),
       ),

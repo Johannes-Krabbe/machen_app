@@ -57,22 +57,7 @@ class _LoginState extends State<Login> {
                   return null;
                 },
               ),
-              const SizedBox(height: 24),
-              Builder(builder: (context) {
-                var authBloc = context.watch<AuthBloc>();
-
-                if (authBloc.state.state == AuthStateEnum.loading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (authBloc.state.state == AuthStateEnum.failure) {
-                  return Center(
-                    child: Text(authBloc.state.error ?? 'Unknown error',
-                        style: const TextStyle(color: Colors.red)),
-                  );
-                }
-                return const SizedBox.shrink();
-              }),
-              const Spacer(),
-              // link to signup
+              const SizedBox(height: 10),
               TextButton(
                 onPressed: () {
                   var authBloc = context.read<AuthBloc>();
@@ -80,22 +65,51 @@ class _LoginState extends State<Login> {
                 },
                 child: const Text('Don\'t have an account? Create one here!'),
               ),
-              TextButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    var authBloc = context.read<AuthBloc>();
-                    authBloc.add(
-                      LoginAuthEvent(
-                        _emailUsernameController.text,
-                        _passwordController.text,
+              Builder(builder: (context) {
+                var authBloc = context.watch<AuthBloc>();
+
+                if (authBloc.state.state == AuthStateEnum.loading) {
+                  return const Column(
+                    children: [
+                      SizedBox(height: 10),
+                      Center(child: CircularProgressIndicator()),
+                    ],
+                  );
+                } else if (authBloc.state.state == AuthStateEnum.failure) {
+                  return Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      Center(
+                        child: Text(authBloc.state.error ?? 'Unknown error',
+                            style: const TextStyle(color: Colors.red)),
                       ),
-                    );
-                  }
-                },
-                child: const Text('Login', style: TextStyle(fontSize: 30)),
-              ),
-              const SizedBox(height: 20),
+                    ],
+                  );
+                }
+                return const SizedBox.shrink();
+              }),
             ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        elevation: 0,
+        color: Colors.transparent,
+        child: TextButton(
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              var authBloc = context.read<AuthBloc>();
+              authBloc.add(
+                LoginAuthEvent(
+                  _emailUsernameController.text,
+                  _passwordController.text,
+                ),
+              );
+            }
+          },
+          child: const Text(
+            'Login',
+            style: TextStyle(fontSize: 25),
           ),
         ),
       ),

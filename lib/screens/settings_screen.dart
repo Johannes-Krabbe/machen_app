@@ -89,14 +89,12 @@ class _SettingsState extends State<Settings> {
                 return updateFunc(username, null, null);
               },
             ),
-            const SizedBox(height: 20),
             InputTile(
                 title: "Email",
                 value: me?.email ?? "",
                 updateFunc: (String email) {
                   return updateFunc(null, null, email);
                 }),
-            const SizedBox(height: 20),
             InputTile(
                 title: "Display Name",
                 value: me?.name ?? "",
