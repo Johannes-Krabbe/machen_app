@@ -1,5 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:machen_app/api/models/user/update_response.dart';
 import 'package:machen_app/api/repositories/user_repository.dart';
 import 'package:machen_app/components/input_tile.dart';
@@ -43,11 +48,38 @@ class _SettingsState extends State<Settings> {
         width: double.infinity,
         child: Column(
           children: [
-            const CircleAvatar(
-              radius: 75,
-              backgroundImage: NetworkImage(
-                "https://www.shutterstock.com/shutterstock/videos/1086926591/thumb/12.jpg?ip=x480",
-              ),
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 75,
+                  backgroundImage: NetworkImage(
+                    authBloc.state.me?.profilePictureUrl ??
+                        'https://storage.googleapis.com/machen-profile-pictures/empty.png',
+                  ),
+                ),
+                Positioned(
+                  right: 0.0,
+                  bottom: 0.0,
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundColor: Colors.grey,
+                    child: IconButton(
+                      onPressed: () async {
+                        var res =
+                            await pickProfilePicture(authBloc.state.token);
+                        if (res) {
+                          authBloc.add(FetchMeAuthEvent());
+                        }
+                      },
+                      icon: Icon(
+                        authBloc.state.me?.profilePictureUrl == null
+                            ? Icons.add
+                            : Icons.edit,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             InputTile(
@@ -87,4 +119,48 @@ class _SettingsState extends State<Settings> {
       ),
     );
   }
+}
+
+Future<bool> pickProfilePicture(String token) async {
+  try {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image == null) {
+      return false;
+    } else {
+      var croppedFile = await ImageCropper().cropImage(
+        sourcePath: image.path,
+        aspectRatio: const CropAspectRatio(
+          ratioX: 1,
+          ratioY: 1,
+        ),
+        uiSettings: [
+          AndroidUiSettings(
+              toolbarTitle: 'Cropper',
+              toolbarColor: Colors.deepOrange,
+              toolbarWidgetColor: Colors.white,
+              initAspectRatio: CropAspectRatioPreset.square,
+              lockAspectRatio: false),
+          IOSUiSettings(
+            title: 'Cropper',
+            aspectRatioLockEnabled: true,
+            resetAspectRatioEnabled: false,
+          )
+        ],
+        compressQuality: 50,
+      );
+
+      if (croppedFile == null) {
+        return false;
+      }
+      var file = File(croppedFile.path);
+
+      var res = await UserRepository().uploadProfilePicture(token, file);
+      return res;
+    }
+  } on PlatformException catch (_) {
+    // todo handle exception
+  }
+  return false;
 }

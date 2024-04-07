@@ -43,6 +43,8 @@ dependencies:
   build_runner: ^2.4.8
   equatable: ^2.0.5
   flutter_secure_storage: ^9.0.0
+  image_cropper: ^5.0.1
+  image_picker: ^1.0.7
 
 dev_dependencies:
   flutter_test:

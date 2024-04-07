@@ -104,10 +104,12 @@ class _MyAppState extends State<MyApp> {
                         Center(
                           child: Row(
                             children: [
-                              const CircleAvatar(
+                              CircleAvatar(
                                 radius: 25,
                                 backgroundImage: NetworkImage(
-                                    "https://www.shutterstock.com/shutterstock/videos/1086926591/thumb/12.jpg?ip=x480"),
+                                  authBloc.state.me?.profilePictureUrl ??
+                                      'https://storage.googleapis.com/machen-profile-pictures/empty.png',
+                                ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(15.0),
