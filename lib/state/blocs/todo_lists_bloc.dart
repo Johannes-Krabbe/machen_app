@@ -33,7 +33,6 @@ class TodoListsBloc extends Bloc<TodoListsEvent, TodoListsState> {
   }
 
   _onLoad(TodoListsLoadEvent event, Emitter<TodoListsState> emit) async {
-    emit(TodoListsState(lists: [], status: TodoListStatus.loading));
     TodoListRepository repository = TodoListRepository();
     var getListsResponse = await repository.getLists(event.token);
     if (getListsResponse.success == true) {

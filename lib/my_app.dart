@@ -200,83 +200,89 @@ class _MyAppState extends State<MyApp> {
                   },
                   child: const Icon(Icons.add),
                 ),
-                body: Container(
-                  color: Theme.of(context).scaffoldBackgroundColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Center(
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 25,
-                                  backgroundImage: NetworkImage(
-                                    authBloc.state.me?.profilePictureUrl ??
-                                        'https://storage.googleapis.com/machen-profile-pictures/empty.png',
+                body: RefreshIndicator(
+                  onRefresh: () async {
+                    todoListsBloc.add(TodoListsLoadEvent(authBloc.state.token));
+                  },
+                  child: Container(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Center(
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 25,
+                                    backgroundImage: NetworkImage(
+                                      authBloc.state.me?.profilePictureUrl ??
+                                          'https://storage.googleapis.com/machen-profile-pictures/empty.png',
+                                    ),
                                   ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(15.0),
-                                  child: SizedBox(
-                                    width: 130,
-                                    height: 25,
-                                    child: Text(
-                                      authBloc.state.me?.name ?? "",
-                                      softWrap: false,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        overflow: TextOverflow.clip,
+                                  Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: SizedBox(
+                                      width: 130,
+                                      height: 25,
+                                      child: Text(
+                                        authBloc.state.me?.name ?? "",
+                                        softWrap: false,
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          overflow: TextOverflow.clip,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                          Row(
-                            children: [
-                              IconButton(
-                                  onPressed: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) => const Settings(),
-                                      ),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.settings))
-                            ],
-                          )
-                        ],
-                      ),
-                      ...todoListRoutes
-                          .asMap()
-                          .entries
-                          .map((e) => ListTile(
-                                title: Text(
-                                  e.value.title,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                            Row(
+                              children: [
+                                IconButton(
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const Settings(),
+                                        ),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.settings))
+                              ],
+                            )
+                          ],
+                        ),
+                        ...todoListRoutes
+                            .asMap()
+                            .entries
+                            .map((e) => ListTile(
+                                  title: Text(
+                                    e.value.title,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                leading: Icon(
-                                  e.value.isMain ? Icons.inbox : Icons.list,
-                                  color: Colors.white,
-                                ),
-                                selected: e.key == _selectedIndex,
-                                onTap: () {
-                                  _selectIndex(e.key);
-                                  Navigator.pop(context);
-                                },
-                              ))
-                          .toList(),
-                      const SizedBox(height: 10),
-                    ],
+                                  leading: Icon(
+                                    e.value.isMain ? Icons.inbox : Icons.list,
+                                    color: Colors.white,
+                                  ),
+                                  selected: e.key == _selectedIndex,
+                                  onTap: () {
+                                    _selectIndex(e.key);
+                                    Navigator.pop(context);
+                                  },
+                                ))
+                            .toList(),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
                   ),
                 ),
               ),
