@@ -71,6 +71,9 @@ class _ListSettingsSheetState extends State<ListSettingsSheet> {
                     SafeArea(
                       child: TextButton(
                         onPressed: () {
+                          if (todoListBloc.state.list?.deletable == false) {
+                            return;
+                          }
                           todoListBloc.add(
                             TodoListDeleteListEvent(authBloc.state.token),
                           );
@@ -78,8 +81,14 @@ class _ListSettingsSheetState extends State<ListSettingsSheet> {
 
                           Navigator.pop(context);
                         },
-                        child: const Text('Delete List',
-                            style: TextStyle(fontSize: 25, color: Colors.red)),
+                        child: Text(
+                          'Delete List',
+                          style: TextStyle(
+                              fontSize: 25,
+                              color: todoListBloc.state.list?.deletable == false
+                                  ? Colors.grey
+                                  : Colors.red),
+                        ),
                       ),
                     )
                   ],

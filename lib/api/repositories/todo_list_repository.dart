@@ -42,12 +42,13 @@ class TodoListRepository extends ApiProvider {
     }
   }
 
-  Future<bool> createList(String token, String name, String description) async {
+  Future<bool> createList(
+      String token, String name, String? description) async {
     try {
       await dio.post("/list/create",
           data: {
             "name": name,
-            "description": description,
+            "description": description ?? '',
           },
           options: Options(headers: {"authorization": "Bearer $token"}));
       return true;
