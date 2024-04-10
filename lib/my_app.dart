@@ -75,12 +75,10 @@ class _MyAppState extends State<MyApp> {
                   child: ListSettingsSheet(
                     todoListId: selectedRoute.id,
                     onUpdate: (bool redirectToInbox) {
-                      var authBloc = context.read<AuthBloc>();
                       if (redirectToInbox) {
                         _selectIndex(0);
                       }
-                      todoListsBloc
-                          .add(TodoListsResetEvent(authBloc.state.token));
+                      todoListsBloc.add(TodoListsResetEvent());
                     },
                   ),
                 ),

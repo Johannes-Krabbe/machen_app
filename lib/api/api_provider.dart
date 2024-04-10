@@ -3,7 +3,7 @@ export 'api_provider.dart';
 
 abstract class ApiProvider {
   final Dio dio = Dio(BaseOptions(
-    // baseUrl: 'http://localhost:8080',
-    baseUrl: 'https://api.machen.app',
+    baseUrl: 'http://localhost:8080',
+    // baseUrl: 'https://api.machen.app',
   ));
 }

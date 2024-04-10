@@ -9,6 +9,7 @@ import 'package:machen_app/api/repositories/user_repository.dart';
 import 'package:machen_app/components/input_tile.dart';
 import 'package:machen_app/state/blocs/auth_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:machen_app/state/blocs/todo_lists_bloc.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
@@ -104,6 +105,8 @@ class _SettingsState extends State<Settings> {
             SafeArea(
               child: TextButton(
                 onPressed: () {
+                  var todoListsBloc = context.read<TodoListsBloc>();
+                  todoListsBloc.add(TodoListsResetEvent());
                   authBloc.add(LogoutAuthEvent());
                   Navigator.pop(context);
                 },

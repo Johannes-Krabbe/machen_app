@@ -69,6 +69,7 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
   _onFetch(TodoListFetchEvent event, Emitter<TodoListState> emit) async {
     emit(state.copyWith(
       id: event.todoListId,
+      list: null,
     ));
     await _refetch(event.token, emit);
   }
