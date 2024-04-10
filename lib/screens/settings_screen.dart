@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:machen_app/api/models/user/update_response.dart';
@@ -65,8 +64,8 @@ class _SettingsState extends State<Settings> {
                     backgroundColor: Colors.grey,
                     child: IconButton(
                       onPressed: () async {
-                        var res =
-                            await pickProfilePicture(authBloc.state.token);
+                        var res = await pickProfilePicture(
+                            authBloc.state.token, context);
                         if (res) {
                           authBloc.add(FetchMeAuthEvent());
                         }
@@ -119,16 +118,60 @@ class _SettingsState extends State<Settings> {
   }
 }
 
-Future<bool> pickProfilePicture(String token) async {
-  try {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+Future<bool> pickProfilePicture(String token, BuildContext context) async {
+  final ImagePicker picker = ImagePicker();
+  XFile? image;
 
+  await showDialog(
+      context: context,
+      builder: (BuildContext context) => Dialog(
+              child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            padding:
+                const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Select Image Source',
+                  style: TextStyle(fontSize: 20),
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () async {
+                        image =
+                            await picker.pickImage(source: ImageSource.camera);
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Camera'),
+                    ),
+                    const SizedBox(width: 20),
+                    TextButton(
+                      onPressed: () async {
+                        image =
+                            await picker.pickImage(source: ImageSource.gallery);
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Gallery'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          )));
+
+  try {
     if (image == null) {
       return false;
     } else {
       var croppedFile = await ImageCropper().cropImage(
-        sourcePath: image.path,
+        sourcePath: image!.path,
         aspectRatio: const CropAspectRatio(
           ratioX: 1,
           ratioY: 1,
