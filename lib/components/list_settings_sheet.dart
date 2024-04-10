@@ -67,6 +67,145 @@ class _ListSettingsSheetState extends State<ListSettingsSheet> {
                           Navigator.pop(context);
                           return response;
                         }),
+                    const SizedBox(height: 20),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: Theme.of(context).brightness == Brightness.light
+                            ? Colors.black12
+                            : Colors.white12,
+                      ),
+                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      // flull width
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Description',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16),
+                                // textAlign: TextAlign.left,
+                              ),
+                              IconButton(
+                                onPressed: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        final controller =
+                                            TextEditingController(
+                                                text: todoListBloc.state.list
+                                                        ?.description ??
+                                                    '');
+                                        return Dialog(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Theme.of(context)
+                                                  .scaffoldBackgroundColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            padding: const EdgeInsets.only(
+                                                top: 20,
+                                                left: 20,
+                                                right: 20,
+                                                bottom: 10),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 10),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    color: Theme.of(context)
+                                                                .brightness ==
+                                                            Brightness.light
+                                                        ? Colors.black12
+                                                        : Colors.white12,
+                                                  ),
+                                                  child: TextField(
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      hintText:
+                                                          "Enter your new description",
+                                                      border: InputBorder.none,
+                                                    ),
+                                                    keyboardType:
+                                                        TextInputType.multiline,
+                                                    maxLines: null,
+                                                    controller: controller,
+                                                    autofocus: true,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 10),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(
+                                                              context),
+                                                      child:
+                                                          const Text('Cancel'),
+                                                    ),
+                                                    const SizedBox(width: 10),
+                                                    TextButton(
+                                                      onPressed: () async {
+                                                        await TodoListRepository()
+                                                            .updateList(
+                                                          authBloc.state.token,
+                                                          todoListBloc.state.id,
+                                                          null,
+                                                          controller.text,
+                                                        );
+                                                        widget.onUpdate(false);
+
+                                                        todoListBloc.add(
+                                                          TodoListFetchEvent(
+                                                            authBloc
+                                                                .state.token,
+                                                            widget.todoListId,
+                                                          ),
+                                                        );
+                                                        Navigator.pop(context);
+                                                      },
+                                                      child:
+                                                          const Text('Update'),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      });
+                                },
+                                icon: const Icon(
+                                  Icons.edit,
+                                  size: 20,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            todoListBloc.state.list?.description ?? '',
+                            style: const TextStyle(fontSize: 16),
+                            textAlign: TextAlign.left,
+                          ),
+                        ],
+                      ),
+                    ),
                     const Spacer(),
                     SafeArea(
                       child: TextButton(
