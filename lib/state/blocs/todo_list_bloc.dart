@@ -41,6 +41,14 @@ final class TodoListToggleItemEvent extends TodoListEvent {
   TodoListToggleItemEvent(this.token, this.id);
 }
 
+final class TodoListUpdateListEvent extends TodoListEvent {
+  final String token;
+  final String? title;
+  final String? description;
+
+  TodoListUpdateListEvent(this.token, this.title, this.description);
+}
+
 // Bloc
 
 class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
@@ -63,6 +71,10 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
 
     on<TodoListDeleteListEvent>((event, emit) async {
       await _onDeleteList(event, emit);
+    });
+
+    on<TodoListUpdateListEvent>((event, emit) async {
+      await _onUpdateList(event, emit);
     });
   }
 
@@ -164,6 +176,29 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
     await _refetch(event.token, emit);
   }
 
+  _onUpdateList(
+      TodoListUpdateListEvent event, Emitter<TodoListState> emit) async {
+    emit(
+      state.copyWith(
+        list: state.list?.copyWith(
+          name: event.title,
+          description: event.description,
+        ),
+      ),
+    );
+
+    var response = await TodoListRepository().updateList(
+      event.token,
+      state.id,
+      event.title,
+      event.description,
+    );
+
+    if (response.success == true) {
+      await _refetch(event.token, emit);
+    }
+  }
+
   _refetch(String token, Emitter<TodoListState> emit) async {
     var getListResponse = await TodoListRepository().getList(token, state.id);
 
@@ -178,6 +213,9 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
 
       completed?.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
       uncompleted?.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
+
+      print('emmiting new state');
+      print(getListResponse.list?.description);
 
       emit(state.copyWith(
         items: [

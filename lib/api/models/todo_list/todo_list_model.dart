@@ -23,6 +23,26 @@ class TodoListModel {
     this.listItems,
   });
 
+  TodoListModel copyWith({
+    String? id,
+    String? createdAt,
+    String? name,
+    String? description,
+    bool? deletable,
+    List<ListPermissionModel>? listPermissions,
+    List<TodoListItemModel>? listItems,
+  }) {
+    return TodoListModel(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      deletable: deletable ?? this.deletable,
+      listPermissions: listPermissions ?? this.listPermissions,
+      listItems: listItems ?? this.listItems,
+    );
+  }
+
   TodoListModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     createdAt = json['createdAt'];
