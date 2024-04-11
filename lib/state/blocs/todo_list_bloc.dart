@@ -81,7 +81,6 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
   _onFetch(TodoListFetchEvent event, Emitter<TodoListState> emit) async {
     emit(state.copyWith(
       id: event.todoListId,
-      list: null,
     ));
     await _refetch(event.token, emit);
   }
@@ -92,6 +91,8 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
       return;
     }
 
+    print('Adding item with title: ${event.title}');
+
     var tempId = DateTime.now().toString();
 
     emit(state.copyWith(
@@ -100,6 +101,8 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
         TodoListItemModel(title: event.title, id: tempId),
       ],
     ));
+
+    print(state.items.map((e) => e.title).toList());
 
     var success = await TodoListRepository()
         .createItem(event.token, state.id, event.title, '');
@@ -213,9 +216,6 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
 
       completed?.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
       uncompleted?.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
-
-      print('emmiting new state');
-      print(getListResponse.list?.description);
 
       emit(state.copyWith(
         items: [

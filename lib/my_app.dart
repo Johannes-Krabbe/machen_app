@@ -37,54 +37,43 @@ class _MyAppState extends State<MyApp> {
       );
     }
 
-    final List<AppRoute> todoListRoutes = todoListsBloc.state.lists
-        .map(
-          (e) => AppRoute(
-            widget: BlocProvider(
-                create: (_) => TodoListBloc(),
-                child: TodoListScreen(todoListId: e.id ?? '')),
-            id: e.id ?? '',
-            title: e.name ?? '',
-            isMain: !(e.deletable ?? true),
-            createdAt: e.createdAt ?? '',
-          ),
-        )
-        .toList();
-
-    todoListRoutes.sort((a, b) => a.createdAt.compareTo(b.createdAt));
-
-    final AppRoute selectedRoute = todoListRoutes.isEmpty
-        ? AppRoute(
-            widget: const Center(child: CircularProgressIndicator()),
-            title: "",
-            createdAt: '',
-            id: '',
-          )
-        : todoListRoutes[_selectedIndex];
-
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: SafeArea(
         bottom: false,
         child: Scaffold(
             appBar: AppBar(
-              title: Text(selectedRoute.title),
-              actions: <Widget>[
-                Provider(
-                  create: (_) => TodoListBloc(),
-                  child: ListSettingsSheet(
-                    todoListId: selectedRoute.id,
-                    onUpdate: (bool redirectToInbox) {
-                      if (redirectToInbox) {
-                        _selectIndex(0);
-                      }
-                      todoListsBloc.add(TodoListsResetEvent());
-                    },
-                  ),
+              title: Text(
+                todoListsBloc.state.lists.isNotEmpty
+                    ? todoListsBloc.state.lists[_selectedIndex].name ?? ''
+                    : 'Loading',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
-              ],
+              ),
             ),
-            body: selectedRoute.widget,
+            body: Builder(builder: (context) {
+              if (todoListsBloc.state.status == TodoListStatus.loading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              if (todoListsBloc.state.lists.isEmpty) {
+                return const Center(
+                  child: Text("No lists found"),
+                );
+              }
+
+              return Provider(
+                create: (_) => TodoListBloc(),
+                child: TodoListScreen(
+                  todoListId:
+                      todoListsBloc.state.lists[_selectedIndex].id ?? '',
+                ),
+              );
+            }),
             drawer: Drawer(
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
@@ -256,19 +245,21 @@ class _MyAppState extends State<MyApp> {
                             )
                           ],
                         ),
-                        ...todoListRoutes
+                        ...todoListsBloc.state.lists
                             .asMap()
                             .entries
                             .map((e) => ListTile(
                                   title: Text(
-                                    e.value.title,
+                                    e.value.name ?? "",
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   leading: Icon(
-                                    e.value.isMain ? Icons.inbox : Icons.list,
+                                    e.value.deletable == false
+                                        ? Icons.inbox
+                                        : Icons.list,
                                     color: Colors.white,
                                   ),
                                   selected: e.key == _selectedIndex,
