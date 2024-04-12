@@ -70,20 +70,8 @@ class InputTile extends StatelessWidget {
                           );
                           return;
                         }
-                        var response = await updateFunc(controller.text);
-                        if (response.success == true) {
-                          Navigator.pop(context, 'Update');
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Center(
-                                  child: Text(
-                                response.messsage ?? 'Unknown error',
-                                style: const TextStyle(fontSize: 18),
-                              )),
-                            ),
-                          );
-                        }
+                        await updateFunc(controller.text);
+                        Navigator.pop(context, 'Update');
                       },
                       child: const Text('Update'),
                     ),

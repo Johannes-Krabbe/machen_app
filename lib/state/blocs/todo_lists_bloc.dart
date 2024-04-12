@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:machen_app/api/models/todo_list/todo_list_model.dart';
 import 'package:machen_app/api/repositories/todo_list_repository.dart';
 import 'package:machen_app/state/types/todo_lists_state.dart';
 
@@ -16,6 +17,12 @@ class TodoListsResetEvent extends TodoListsEvent {
   TodoListsResetEvent();
 }
 
+class TodoListsUpdatedListEvent extends TodoListsEvent {
+  final TodoListModel list;
+
+  TodoListsUpdatedListEvent(this.list);
+}
+
 // Bloc
 
 class TodoListsBloc extends Bloc<TodoListsEvent, TodoListsState> {
@@ -27,6 +34,15 @@ class TodoListsBloc extends Bloc<TodoListsEvent, TodoListsState> {
 
     on<TodoListsResetEvent>((event, emit) async {
       emit(TodoListsState(lists: [], status: TodoListStatus.initial));
+    });
+
+    on<TodoListsUpdatedListEvent>((event, emit) async {
+      var lists = state.lists;
+      var index = lists.indexWhere((element) => element.id == event.list.id);
+      if (index != -1) {
+        lists[index] = event.list;
+        emit(TodoListsState(lists: lists, status: TodoListStatus.loaded));
+      }
     });
   }
 

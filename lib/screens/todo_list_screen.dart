@@ -30,6 +30,13 @@ class _TodoListScreenState extends State<TodoListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.todoListId != context.read<TodoListBloc>().state.list?.id) {
+      var authBloc = context.read<AuthBloc>();
+      context
+          .read<TodoListBloc>()
+          .add(TodoListFetchEvent(authBloc.state.token, widget.todoListId));
+    }
+
     return Scaffold(
       body: Column(
         children: [

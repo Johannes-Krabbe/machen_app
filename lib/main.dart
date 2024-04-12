@@ -4,6 +4,7 @@ import 'package:machen_app/my_app.dart';
 import 'package:machen_app/screens/signup_screen.dart';
 import 'package:machen_app/state/blocs/auth_bloc.dart';
 import 'package:machen_app/screens/login_screen.dart';
+import 'package:machen_app/state/blocs/todo_list_bloc.dart';
 import 'package:machen_app/state/blocs/todo_lists_bloc.dart';
 import 'package:machen_app/state/types/auth_state.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +21,7 @@ void main() async {
         lazy: false,
         create: (_) => TodoListsBloc(),
       ),
+      BlocProvider(lazy: false, create: (_) => TodoListBloc())
     ],
     child: const AppRoot(),
   ));
