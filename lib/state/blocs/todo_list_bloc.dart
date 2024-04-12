@@ -50,6 +50,8 @@ final class TodoListUpdateListEvent extends TodoListEvent {
   TodoListUpdateListEvent(this.token, this.title, this.description);
 }
 
+final class TodoListResetEvent extends TodoListEvent {}
+
 // Bloc
 
 class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
@@ -76,6 +78,10 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
 
     on<TodoListUpdateListEvent>((event, emit) async {
       await _onUpdateList(event, emit);
+    });
+
+    on<TodoListResetEvent>((event, emit) async {
+      emit(TodoListState(id: '', list: null));
     });
   }
 

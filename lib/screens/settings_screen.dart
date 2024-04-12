@@ -9,6 +9,7 @@ import 'package:machen_app/api/repositories/user_repository.dart';
 import 'package:machen_app/components/input_tile.dart';
 import 'package:machen_app/state/blocs/auth_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:machen_app/state/blocs/todo_list_bloc.dart';
 import 'package:machen_app/state/blocs/todo_lists_bloc.dart';
 
 class Settings extends StatefulWidget {
@@ -107,6 +108,7 @@ class _SettingsState extends State<Settings> {
                 onPressed: () {
                   var todoListsBloc = context.read<TodoListsBloc>();
                   todoListsBloc.add(TodoListsResetEvent());
+                  context.read<TodoListBloc>().add(TodoListResetEvent());
                   authBloc.add(LogoutAuthEvent());
                   Navigator.pop(context);
                 },
