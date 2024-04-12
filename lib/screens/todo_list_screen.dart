@@ -36,13 +36,17 @@ class _TodoListScreenState extends State<TodoListScreen> {
           Expanded(
             child: BlocBuilder<TodoListBloc, TodoListState>(
               builder: (context, state) {
-                if (state.items.isEmpty) {
+                if (state.list == null || state.list?.listItems == null) {
                   return const CircularProgressIndicator();
+                } else if (state.list!.listItems!.isEmpty) {
+                  return const Center(
+                    child: Text('No tasks'),
+                  );
                 } else {
                   return ListView.builder(
-                    itemCount: state.items.length,
+                    itemCount: state.list?.listItems?.length,
                     itemBuilder: (context, index) {
-                      final item = state.items[index];
+                      final item = state.list!.listItems![index];
                       return Dismissible(
                         key: Key(item.id ?? ''),
                         background: Container(

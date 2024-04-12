@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:machen_app/api/models/todo_list/todo_list_item_model.dart';
+import 'package:machen_app/api/models/todo_list/todo_list_model.dart';
 import 'package:machen_app/api/repositories/todo_list_repository.dart';
 import 'package:machen_app/state/types/todo_list_state.dart';
 
@@ -52,7 +53,7 @@ final class TodoListUpdateListEvent extends TodoListEvent {
 // Bloc
 
 class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
-  TodoListBloc() : super(TodoListState(id: '', items: [], list: null)) {
+  TodoListBloc() : super(TodoListState(id: '', list: null)) {
     on<TodoListFetchEvent>((event, emit) async {
       await _onFetch(event, emit);
     });
@@ -91,25 +92,39 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
       return;
     }
 
-    print('Adding item with title: ${event.title}');
-
     var tempId = DateTime.now().toString();
 
+    var tmpItem = TodoListItemModel(
+      id: tempId,
+      title: event.title,
+      completed: false,
+      createdAt: DateTime.now().toString(),
+    );
+
     emit(state.copyWith(
-      items: [
-        ...state.items,
-        TodoListItemModel(title: event.title, id: tempId),
-      ],
+      list: state.list?.copyWith(
+            listItems: [
+              ...state.list?.listItems ?? [],
+              tmpItem,
+            ],
+          ) ??
+          TodoListModel(listItems: [tmpItem]),
     ));
 
-    print(state.items.map((e) => e.title).toList());
+    // print(state.list?.listItems?.map((e) => e.title).toList());
 
     var success = await TodoListRepository()
         .createItem(event.token, state.id, event.title, '');
     if (!success) {
-      emit(state.copyWith(
-        items: state.items.where((item) => item.id != tempId).toList(),
-      ));
+      emit(
+        state.copyWith(
+          list: state.list?.copyWith(
+            listItems: state.list?.listItems
+                ?.where((item) => item.id != tempId)
+                .toList(),
+          ),
+        ),
+      );
     } else {
       await _refetch(event.token, emit);
     }
@@ -117,48 +132,68 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
 
   _onDeleteItem(
       TodoListDeleteItemEvent event, Emitter<TodoListState> emit) async {
-    var tmpItem = state.items.where((item) => item.id == event.id).first;
+    var tmpItem =
+        state.list?.listItems?.where((item) => item.id == event.id).first;
 
     emit(state.copyWith(
-      items: state.items.where((item) => item.id != event.id).toList(),
-    ));
+        list: state.list?.copyWith(
+      listItems:
+          state.list?.listItems?.where((item) => item.id != event.id).toList(),
+    )));
 
     var success = await TodoListRepository().deleteItem(event.token, event.id);
     if (!success) {
-      emit(state.copyWith(
-        items: [...state.items, tmpItem],
-      ));
+      emit(
+        state.copyWith(
+          list: state.list?.copyWith(
+            listItems: [
+              ...(state.list?.listItems ?? []),
+              tmpItem ?? TodoListItemModel()
+            ],
+          ),
+        ),
+      );
     }
     await _refetch(event.token, emit);
   }
 
   _onToggleItem(
       TodoListToggleItemEvent event, Emitter<TodoListState> emit) async {
-    var completed =
-        (state.items.where((item) => item.id == event.id).first.completed) ??
-            false;
+    var completed = (state.list?.listItems
+            ?.where((item) => item.id == event.id)
+            .first
+            .completed) ??
+        false;
 
-    emit(state.copyWith(
-      items: state.items.map((item) {
-        if (item.id == event.id) {
-          return item.copyWith(completed: !completed);
-        }
-        return item;
-      }).toList(),
-    ));
+    emit(
+      state.copyWith(
+        list: state.list?.copyWith(
+          listItems: state.list?.listItems?.map((item) {
+            if (item.id == event.id) {
+              return item.copyWith(completed: !completed);
+            }
+            return item;
+          }).toList(),
+        ),
+      ),
+    );
 
     var getListResponse = await TodoListRepository()
         .updateItem(event.token, event.id, null, null, !completed);
 
     if (getListResponse == false) {
-      emit(state.copyWith(
-        items: state.items.map((item) {
-          if (item.id == event.id) {
-            return item.copyWith(completed: completed);
-          }
-          return item;
-        }).toList(),
-      ));
+      emit(
+        state.copyWith(
+          list: state.list?.copyWith(
+            listItems: state.list?.listItems?.map((item) {
+              if (item.id == event.id) {
+                return item.copyWith(completed: completed);
+              }
+              return item;
+            }).toList(),
+          ),
+        ),
+      );
     }
 
     await _refetch(event.token, emit);
@@ -171,7 +206,6 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
 
     if (deleteListResponse == true) {
       emit(state.copyWith(
-        items: [],
         list: null,
         isDeleted: true,
       ));
@@ -218,12 +252,12 @@ class TodoListBloc extends Bloc<TodoListEvent, TodoListState> {
       uncompleted?.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
 
       emit(state.copyWith(
-        items: [
-          ...uncompleted ?? [],
-          ...completed ?? [],
+          list: getListResponse.list?.copyWith(
+        listItems: [
+          ...(uncompleted ?? []),
+          ...(completed ?? []),
         ],
-        list: getListResponse.list,
-      ));
+      )));
     }
   }
 }
