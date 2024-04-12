@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:machen_app/api/repositories/todo_list_repository.dart';
 import 'package:machen_app/components/list_settings_sheet.dart';
 import 'package:machen_app/screens/settings_screen.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:machen_app/screens/todo_list_screen.dart';
 import 'package:machen_app/state/blocs/auth_bloc.dart';
 import 'package:machen_app/state/blocs/todo_list_bloc.dart';
@@ -41,8 +40,20 @@ class _MyAppState extends State<MyApp> {
       color: Theme.of(context).scaffoldBackgroundColor,
       child: SafeArea(
         bottom: false,
-        child: Scaffold(
+        child: Provider(
+          create: (_) => TodoListBloc(),
+          child: Scaffold(
             appBar: AppBar(
+              actions: <Widget>[
+                ListSettingsSheet(
+                  onUpdate: (bool redirectToInbox) {
+                    if (redirectToInbox) {
+                      _selectIndex(0);
+                    }
+                    todoListsBloc.add(TodoListsResetEvent());
+                  },
+                ),
+              ],
               title: Text(
                 todoListsBloc.state.lists.isNotEmpty
                     ? todoListsBloc.state.lists[_selectedIndex].name ?? ''
@@ -66,12 +77,8 @@ class _MyAppState extends State<MyApp> {
                 );
               }
 
-              return Provider(
-                create: (_) => TodoListBloc(),
-                child: TodoListScreen(
-                  todoListId:
-                      todoListsBloc.state.lists[_selectedIndex].id ?? '',
-                ),
+              return TodoListScreen(
+                todoListId: todoListsBloc.state.lists[_selectedIndex].id ?? '',
               );
             }),
             drawer: Drawer(
@@ -275,7 +282,9 @@ class _MyAppState extends State<MyApp> {
                   ),
                 ),
               ),
-            )),
+            ),
+          ),
+        ),
       ),
     );
   }
