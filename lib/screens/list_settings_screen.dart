@@ -9,8 +9,10 @@ import 'package:machen_app/state/types/todo_list_state.dart';
 
 class ListSettingsScreen extends StatefulWidget {
   final String? todoListId;
+  final Function onDeleted;
 
-  const ListSettingsScreen({Key? key, required this.todoListId})
+  const ListSettingsScreen(
+      {Key? key, required this.todoListId, required this.onDeleted})
       : super(key: key);
 
   @override
@@ -94,7 +96,7 @@ class _ListSettingsScreenState extends State<ListSettingsScreen> {
                 SafeArea(
                   child: TextButton(
                     onPressed: () {
-                      if (context.watch<TodoListBloc>().state.list?.deletable ==
+                      if (context.read<TodoListBloc>().state.list?.deletable ==
                           false) {
                         return;
                       }
@@ -102,7 +104,7 @@ class _ListSettingsScreenState extends State<ListSettingsScreen> {
                             TodoListDeleteListEvent(
                                 context.read<AuthBloc>().state.token),
                           );
-                      Navigator.pop(context);
+                      widget.onDeleted();
                     },
                     child: Text(
                       'Delete List',

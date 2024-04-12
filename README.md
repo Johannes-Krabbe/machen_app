@@ -1,16 +1,9 @@
 # machen_app
 
-A new Flutter project.
+A TODO list App written in Flutter.
 
-## Getting Started
+## Setup
 
-This project is a starting point for a Flutter application.
+This app relies on an API. Find instructions to run it yourself in the (github repo)[https://github.com/Johannes-Krabbe/machen_api] or use the deployed version at `https://api.machen.app`.
+If you decided on how you want to run the API make sure that you have entered the correct `baseUrl` in `lib/api/api_provider.dart`
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.

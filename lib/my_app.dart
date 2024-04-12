@@ -8,7 +8,6 @@ import 'package:machen_app/state/blocs/auth_bloc.dart';
 import 'package:machen_app/state/blocs/todo_lists_bloc.dart';
 import 'package:machen_app/state/types/auth_state.dart';
 import 'package:machen_app/state/types/todo_lists_state.dart';
-import 'package:provider/provider.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -62,6 +61,15 @@ class _MyAppState extends State<MyApp> {
                           builder: (context) => ListSettingsScreen(
                             todoListId:
                                 todoListsBloc.state.lists[_selectedIndex].id,
+                            onDeleted: () {
+                              todoListsBloc.add(
+                                TodoListDeletedEvent(todoListsBloc
+                                        .state.lists[_selectedIndex].id ??
+                                    ''),
+                              );
+                              _selectIndex(0);
+                              Navigator.of(context).pop();
+                            },
                           ),
                         ),
                       );

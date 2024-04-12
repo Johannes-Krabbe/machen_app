@@ -23,6 +23,12 @@ class TodoListsUpdatedListEvent extends TodoListsEvent {
   TodoListsUpdatedListEvent(this.list);
 }
 
+class TodoListDeletedEvent extends TodoListsEvent {
+  final String listId;
+
+  TodoListDeletedEvent(this.listId);
+}
+
 // Bloc
 
 class TodoListsBloc extends Bloc<TodoListsEvent, TodoListsState> {
@@ -41,6 +47,17 @@ class TodoListsBloc extends Bloc<TodoListsEvent, TodoListsState> {
       var index = lists.indexWhere((element) => element.id == event.list.id);
       if (index != -1) {
         lists[index] = event.list;
+        lists.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
+        emit(TodoListsState(lists: lists, status: TodoListStatus.loaded));
+      }
+    });
+
+    on<TodoListDeletedEvent>((event, emit) async {
+      var lists = state.lists;
+      var index = lists.indexWhere((element) => element.id == event.listId);
+      if (index != -1) {
+        lists.removeAt(index);
+        lists.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
         emit(TodoListsState(lists: lists, status: TodoListStatus.loaded));
       }
     });
@@ -51,6 +68,8 @@ class TodoListsBloc extends Bloc<TodoListsEvent, TodoListsState> {
     TodoListRepository repository = TodoListRepository();
     var getListsResponse = await repository.getLists(event.token);
     if (getListsResponse.success == true) {
+      getListsResponse.lists
+          ?.sort((a, b) => a.createdAt!.compareTo(b.createdAt!));
       emit(TodoListsState(
           lists: getListsResponse.lists ?? [], status: TodoListStatus.loaded));
     }
